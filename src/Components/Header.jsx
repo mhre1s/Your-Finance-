@@ -4,7 +4,7 @@ import {Menu, X, Sun, Moon} from 'lucide-react'
 const Header = () => {
   return (
     <>
-    <header className='flex justify-between py-4 border-b-1 border-solid border-slate-200'>
+    <header className='flex justify-between py-4 border-b-1 border-solid border-slate-200 shadow-md shadow-slate-500'>
         <button className='hover:cursor-pointer hover:bg-slate-100 duration-300 border-1 border-slate-200 border-solid rounded-md ml-8'>
             <Menu size={32}/>
         </button>
