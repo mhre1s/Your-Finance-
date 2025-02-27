@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
-import {Menu, X, Sun, Moon} from 'lucide-react'
+import {Menu, BarChart, LayoutDashboard, Coins, PlusCircle} from 'lucide-react'
+import { XMarkIcon } from '@heroicons/react/24/solid';
+import { RiMoonClearFill, RiSunFill} from 'react-icons/ri';
+
+
 
 const Header = () => {
   const [theme, setTheme] = useState('light')
+  const [sideBar, setSideBar] = useState(false)
   const changeTheme = (e)=>{
     e.preventDefault()
     if(theme === 'light'){
@@ -14,16 +19,35 @@ const Header = () => {
       setTheme('light')
     }
   }
+  const handleSideBar = () =>{
+    if(!sideBar){
+    setSideBar(true)
+    
+  }
+  else{
+    setSideBar(false)
+  }
+  }
   return (
     <>
     <header className='dark:bg-gray-950 dark:text-white dark:border-slate-700 flex justify-between py-4 border-b-1 border-solid border-slate-200 shadow-md shadow-slate-500'>
-        <button className='hover:cursor-pointer hover:bg-slate-100 duration-300 border-1 border-slate-200 border-solid rounded-md ml-8 dark:hover:bg-slate-700'>
+        <aside className={`w-64 absolute gap-14 flex flex-col top-0 left-0 h-screen dark:bg-slate-800 dark:border-slate-700 bg-gray-100 border-1 border-solid border-slate-200 ${sideBar ? `block`: `hidden`}`}>
+          <div className='w-full flex justify-end'>
+            <button onClick={handleSideBar} className='m-3 cursor-pointer'><XMarkIcon className="h-6 w-6 hover:rounded-4xl text-red-400 dark:hover:bg-amber-50 duration-500 hover:bg-slate-400"/></button>
+          </div>
+          <ol className='flex flex-col gap-5 items-center'>
+            <li className='flex items-center gap-2'><LayoutDashboard size={20}/> Dashboards</li>
+            <li className='flex items-center gap-2'><BarChart size={20}/>Gráficos</li>
+            <li className='flex items-center gap-2'><Coins size={20}/>Transações</li>
+            <li className='flex items-center gap-2'><PlusCircle size={20}/>Adicionar Transação</li>
+          </ol>
+        </aside>
+        <button onClick={handleSideBar} className='hover:cursor-pointer hover:rounded-md hover:bg-slate-100 duration-300 ml-8 dark:hover:bg-slate-800'>
             <Menu size={28}/>
         </button>
-        <h1 className='text-2xl'>Your Finance$</h1>
+        <h1 className='text-2xl'>Your Finance<span className='text-green-800'>$</span></h1>
         <button onClick={changeTheme} className=' mr-8 hover:cursor-pointer hover:text-yellow-500 duration-300'>
-          {theme === 'light' ? <Moon className='animate-slideLeft' size={32}/> : <Sun className='animate-slideLeft' size={32}/>}
-            
+          {theme === 'light' ? <RiMoonClearFill  className='animate-slideLeft' size={25}/> : <RiSunFill  className='animate-slideLeft' size={25}/>}
         </button>
     </header>
     </>
