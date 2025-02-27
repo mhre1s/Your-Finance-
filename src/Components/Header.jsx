@@ -31,7 +31,7 @@ const Header = () => {
   return (
     <>
     <header className='dark:bg-gray-950 dark:text-white dark:border-slate-700 flex justify-between py-4 border-b-1 border-solid border-slate-200 shadow-md shadow-slate-500'>
-        <aside className={`w-64 absolute gap-14 flex flex-col top-0 left-0 h-screen dark:bg-slate-800 dark:border-slate-700 bg-gray-100 border-1 border-solid border-slate-200 ${sideBar ? `block`: `hidden`}`}>
+        <aside className={`w-full sm:w-64 absolute gap-14 flex flex-col top-0 left-0 h-screen dark:bg-slate-800 dark:border-slate-700 bg-gray-100 border-1 border-solid border-slate-200 ${sideBar ? `block`: `hidden`}`}>
           <div className='w-full flex justify-end'>
             <button onClick={handleSideBar} className='m-3 cursor-pointer'><XMarkIcon className="h-6 w-6 hover:rounded-4xl text-red-400 dark:hover:bg-amber-50 duration-500 hover:bg-slate-400"/></button>
           </div>
