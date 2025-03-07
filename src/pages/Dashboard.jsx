@@ -4,7 +4,7 @@ import TransactionCard from '../Components/TransactionCard'
 import TransactionRedCard from '../Components/TransactionRedCard'
 import TransactionNeutralCard from '../Components/TransactionNeutralCard'
 const Dashboard = () => {
-  const [receipts, setReceipts] = useState(600)
+  const [receipts, setReceipts] = useState(900)
   const [expenses, setExpenses] = useState(780)
   const [amount, setAmount] = useState(0)
   const transactions = [

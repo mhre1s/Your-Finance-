@@ -4,12 +4,14 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import './index.css'
 import App from './App.jsx'
 import Dashboard from './pages/Dashboard.jsx';
+import NewTransaction from './pages/NewTransaction.jsx';
 
 createRoot(document.getElementById('root')).render(
   
       <BrowserRouter>
         <Routes>
           <Route path='/' element={<Dashboard/>}/>
+          <Route path='newtransaction' element={<NewTransaction/>}/>
         </Routes>
       </BrowserRouter>
   
