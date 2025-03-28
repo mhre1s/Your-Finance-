@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {Menu, BarChart, LayoutDashboard, Coins, PlusCircle} from 'lucide-react'
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { RiMoonClearFill, RiSunFill} from 'react-icons/ri';
+import { NavLink } from 'react-router';
 
 
 
@@ -37,10 +38,13 @@ const Header = () => {
             <button onClick={handleSideBar} className='m-3 cursor-pointer'><XMarkIcon className="h-6 w-6 hover:rounded-4xl text-red-400 dark:hover:bg-amber-50 duration-500 hover:bg-slate-400"/></button>
           </div>
           <ol className='flex flex-col gap-5 items-center'>
-            <li className='flex items-center gap-2'><LayoutDashboard size={20}/> Dashboards</li>
-            <li className='flex items-center gap-2'><BarChart size={20}/>Gráficos</li>
+            <li className='flex items-center gap-2'><LayoutDashboard size={20}/><NavLink to='/' className={({isActive})=>
+            isActive ? 'text-sky-300' : ''}>Dashboards</NavLink></li>
+            <li className='flex items-center gap-2'><BarChart size={20} /><NavLink to='graphics' className={({isActive})=>
+            isActive ? 'text-sky-300' : ''}>Gráficos</NavLink></li>
             <li className='flex items-center gap-2'><Coins size={20}/>Transações</li>
-            <li className='flex items-center gap-2'><PlusCircle size={20}/>Adicionar Transação</li>
+            <li className='flex items-center gap-2'><PlusCircle size={20}/><NavLink to='/newtransaction' className={({isActive})=>
+            isActive ? 'text-sky-300' : ''}>Adicionar Transação</NavLink></li>
           </ol>
         </aside>
         <button onClick={handleSideBar} className='hover:cursor-pointer hover:rounded-md hover:bg-slate-100 duration-300 ml-8 dark:hover:bg-slate-800'>
