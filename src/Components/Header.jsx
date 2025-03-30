@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {Menu, BarChart, LayoutDashboard, Coins, PlusCircle} from 'lucide-react'
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { RiMoonClearFill, RiSunFill} from 'react-icons/ri';
@@ -9,16 +9,21 @@ import { NavLink } from 'react-router';
 const Header = () => {
   const [theme, setTheme] = useState('light')
   const [sideBar, setSideBar] = useState(false)
-  const changeTheme = (e)=>{
-    e.preventDefault()
+
+  useEffect(()=>{
     if(theme === 'light'){
       document.documentElement.classList.add('dark')
-      setTheme('dark')
+      
     }
     else{
       document.documentElement.classList.remove('dark')
-      setTheme('light')
+      
     }
+  },[theme])
+
+  const changeTheme = (e)=>{
+    e.preventDefault()
+    setTheme(theme === 'light' ? 'dark' : 'light')
   }
   const handleSideBar = () =>{
     if(!sideBar){
