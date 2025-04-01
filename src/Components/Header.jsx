@@ -7,7 +7,7 @@ import { NavLink } from 'react-router';
 
 
 const Header = () => {
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState(localStorage.getItem('theme' || 'light'))
   const [sideBar, setSideBar] = useState(false)
 
   useEffect(()=>{
@@ -17,8 +17,8 @@ const Header = () => {
     }
     else{
       document.documentElement.classList.remove('dark')
-      
     }
+    localStorage.setItem('theme', theme)
   },[theme])
 
   const changeTheme = (e)=>{
