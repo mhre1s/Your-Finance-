@@ -3,6 +3,22 @@ import Header from '../Components/Header'
 
 const NewTransaction = () => {
 
+  const handleSubmit = (e) =>{
+    e.preventDefault()
+    const newTransaction = {...formData}
+    setTransactions(prevTransaction =>[...prevTransaction, newTransaction])
+    setFormData({
+      type: '',
+      category: '',
+      title: '',
+      value: '',
+      date: '',
+      expenseName: ''
+    })
+    
+  }
+
+const [transactions, setTransactions] = useState([]);
 const handleChange = (e) =>{
   const {name,value} = e.target
   setFormData(prevData =>({
@@ -23,7 +39,7 @@ const handleChange = (e) =>{
         <Header/>
         <h2 className='text-center text-2xl mt-10 dark:text-white'>Adicionar transação</h2>
         <div className='flex justify-center mt-20'>
-          <form className='grid grid-cols-2 items-center w-96 gap-y-5 p-8 shadow-slate-500 dark:shadow-slate-800 bg-gray-100 shadow-md dark:bg-gray-800 rounded-xl'>
+          <form onSubmit={handleSubmit} className='grid grid-cols-2 items-center w-96 gap-y-5 p-8 shadow-slate-500 dark:shadow-slate-800 bg-gray-100 shadow-md dark:bg-gray-800 rounded-xl'>
               <div className=' flex justify-center col-span-2 gap-2'>
                 <label htmlFor="incoming">
                   <span className='dark:text-white'>Recebimento</span>
@@ -67,7 +83,7 @@ const handleChange = (e) =>{
                   <label htmlFor="category">
                     <span className='dark:text-white'>Categoria</span>
                   </label>
-                  <select value={formData.category} onChange={handleChange} className='dark:text-white bg-gray-800 focus:outline-none text-center' name="category" id="category">
+                  <select value={formData.category} onChange={handleChange} className='dark:text-white bg-gray-100 dark:bg-gray-800 focus:outline-none text-center' name="category" id="category">
                     <option value="">Categoria</option>
                     <option value="contas-residenciais">Residência (luz,água)</option>
                     <option value="condução">Condução</option>
@@ -105,6 +121,10 @@ const handleChange = (e) =>{
                     type="date" name="date" id="date" onChange={handleChange} value={formData.date} />
                 </>
               )}
+              <div className='flex justify-center col-span-2 mt-5'>
+                <input className='text-white bg-green-700 rounded-lg p-5 text-md hover:bg-green-500 cursor-pointer duration-300' type="submit" value="Confirmar" />
+              </div>
+              
           </form>  
         </div>
     </div>
