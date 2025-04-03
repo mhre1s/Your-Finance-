@@ -15,7 +15,7 @@ const NewTransaction = () => {
       date: '',
       expenseName: ''
     })
-    
+    console.log('transaçao adicionada: ', newTransaction, transactions)
   }
 
 const [transactions, setTransactions] = useState([]);
@@ -44,11 +44,11 @@ const handleChange = (e) =>{
                 <label htmlFor="incoming">
                   <span className='dark:text-white'>Recebimento</span>
                 </label>
-                <input type="radio" name="type" id="incoming" value="recebimento" onChange={handleChange} checked={formData.type === 'recebimento'} />
+                <input required type="radio" name="type" id="incoming" value="recebimento" onChange={handleChange} checked={formData.type === 'recebimento'} />
                 <label htmlFor="expenses">
                   <span className='dark:text-white'>Despesa</span>
                 </label>
-                <input type="radio" name="type" id="expenses" value="despesa" onChange={handleChange} checked={formData.type === 'despesa'} />
+                <input type="radio" required name="type" id="expenses" value="despesa" onChange={handleChange} checked={formData.type === 'despesa'} />
               </div>
 
               {formData.type === 'recebimento' && (
@@ -59,15 +59,15 @@ const handleChange = (e) =>{
                   <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
                     dark:border-slate-700 rounded-lg p-1.5 
                       [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
-                    type="text" name="title" id="title" onChange={handleChange} value={formData.title} />
+                    type="text" name="title" id="title" required onChange={handleChange} value={formData.title} />
 
                   <label htmlFor="value">
-                    <span className='dark:text-white'>Valor de recebimento</span>
+                    <span className='dark:text-white'>Valor da transação</span>
                   </label>
                   <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
                     dark:border-slate-700 rounded-lg p-1.5 
                       [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
-                    type="number" name="value" id="value" onChange={handleChange} value={formData.value} />
+                    type="number" name="value" id="value" required onChange={handleChange} value={formData.value} />
 
                   <label htmlFor="date">
                     <span className='dark:text-white'>Data</span>
@@ -75,7 +75,7 @@ const handleChange = (e) =>{
                   <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
                     dark:border-slate-700 rounded-lg p-1.5 
                       [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
-                    type="date" name="date" id="date" onChange={handleChange} value={formData.date} />
+                    type="date" name="date" id="date" required onChange={handleChange} value={formData.date} />
                 </>
               )}
               {formData.type === 'despesa' && (
@@ -83,11 +83,11 @@ const handleChange = (e) =>{
                   <label htmlFor="category">
                     <span className='dark:text-white'>Categoria</span>
                   </label>
-                  <select value={formData.category} onChange={handleChange} className='dark:text-white bg-gray-100 dark:bg-gray-800 focus:outline-none text-center' name="category" id="category">
+                  <select value={formData.category} required onChange={handleChange} className='dark:text-white bg-gray-100 dark:bg-gray-800 focus:outline-none text-center' name="category" id="category">
                     <option value="">Categoria</option>
                     <option value="contas-residenciais">Residência (luz,água)</option>
                     <option value="condução">Condução</option>
-                    <option value="lazer">Alimentação</option>
+                    <option value="alimentação">Alimentação</option>
                     <option value="educação">Educação</option>
                     <option value="saúde">Saúde</option>
                     <option value="Outros">Outros</option>
@@ -97,7 +97,7 @@ const handleChange = (e) =>{
                   <label htmlFor="">
                     <span className='dark:text-white'>Nome de sua despesa</span>
                   </label>
-                  <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
+                  <input required className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
                     dark:border-slate-700 rounded-lg p-1.5 
                       [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
                     type="text" name="expenseName" id="expense-name" onChange={handleChange} value={formData.expenseName} />
@@ -110,7 +110,7 @@ const handleChange = (e) =>{
                   <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
                     dark:border-slate-700 rounded-lg p-1.5 
                       [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
-                    type="number" name="value" id="value" onChange={handleChange} value={formData.value} />
+                    type="number" required name="value" id="value" onChange={handleChange} value={formData.value} />
 
                   <label htmlFor="date">
                     <span className='dark:text-white'>Data</span>
@@ -118,7 +118,7 @@ const handleChange = (e) =>{
                   <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
                     dark:border-slate-700 rounded-lg p-1.5 
                       [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
-                    type="date" name="date" id="date" onChange={handleChange} value={formData.date} />
+                    type="date" name="date" required id="date" onChange={handleChange} value={formData.date} />
                 </>
               )}
               <div className='flex justify-center col-span-2 mt-5'>
