@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import Header from '../Components/Header'
+import { db } from '../firebaseconfig'
+import { collection, addDoc } from 'firebase/firestore'
 
 const NewTransaction = () => {
 
