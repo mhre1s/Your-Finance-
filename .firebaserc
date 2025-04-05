@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "your-finances-db",
+    "e.g. staging": "your-finances-db"
+  },
+  "targets": {},
+  "etags": {}
+}
