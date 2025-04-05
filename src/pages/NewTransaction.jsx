@@ -1,24 +1,30 @@
 import React, { useState } from 'react'
 import Header from '../Components/Header'
 
+import { db } from '../firebaseconfig'
+import { collection, addDoc } from 'firebase/firestore'
+
 const NewTransaction = () => {
 
-  const handleSubmit = (e) =>{
+  const handleSubmit = async (e) =>{
     e.preventDefault()
-    const newTransaction = {...formData}
-    setTransactions(prevTransaction =>[...prevTransaction, newTransaction])
-    setFormData({
+    
+    try {
+      const newTransaction = {...formData, createdAt: new Date()}
+      await addDoc(collection(db, "transactions"), newTransaction)
+      setFormData({
       type: '',
-      category: '',
       title: '',
       value: '',
       date: '',
       expenseName: ''
     })
-    console.log('transaçao adicionada: ', newTransaction, transactions)
+    } 
+    catch (error) {
+      console.error("Erro ao salvar transação:", error);
+    }
   }
 
-const [transactions, setTransactions] = useState([]);
 const handleChange = (e) =>{
   const {name,value} = e.target
   setFormData(prevData =>({
@@ -28,7 +34,6 @@ const handleChange = (e) =>{
 }
   const [formData, setFormData] = useState({
     type: '',
-    category: '',
     title: '',
     value: '',
     date: '',
@@ -83,7 +88,7 @@ const handleChange = (e) =>{
                   <label htmlFor="category">
                     <span className='dark:text-white'>Categoria</span>
                   </label>
-                  <select value={formData.category} required onChange={handleChange} className='dark:text-white bg-gray-100 dark:bg-gray-800 focus:outline-none text-center' name="category" id="category">
+                  <select value={formData.title} required onChange={handleChange} className='dark:text-white bg-gray-100 dark:bg-gray-800 focus:outline-none text-center' name="category" id="category">
                     <option value="">Categoria</option>
                     <option value="contas-residenciais">Residência (luz,água)</option>
                     <option value="condução">Condução</option>
