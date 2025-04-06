@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Header from '../Components/Header'
 
 import { db } from '../firebaseconfig'
-import { collection, addDoc } from 'firebase/firestore'
+import { collection, addDoc, getDocs, updateDoc, doc } from 'firebase/firestore'
 
 const NewTransaction = () => {
 
@@ -12,6 +12,7 @@ const NewTransaction = () => {
     try {
       const newTransaction = {...formData, createdAt: new Date()}
       await addDoc(collection(db, "transactions"), newTransaction)
+      alert('Lançamento realizado com sucesso')
       setFormData({
       type: '',
       title: '',
@@ -44,7 +45,7 @@ const handleChange = (e) =>{
         <Header/>
         <h2 className='text-center text-2xl mt-10 dark:text-white'>Adicionar transação</h2>
         <div className='flex justify-center mt-20'>
-          <form onSubmit={handleSubmit} className='grid grid-cols-2 items-center w-96 gap-y-5 p-8 shadow-slate-500 dark:shadow-slate-800 bg-gray-100 shadow-md dark:bg-gray-800 rounded-xl'>
+          <form onSubmit={handleSubmit} className=' animate-slideUp grid grid-cols-2 items-center w-96 gap-y-5 p-8 shadow-slate-500 dark:shadow-slate-800 bg-gray-100 shadow-md dark:bg-gray-800 rounded-xl'>
               <div className=' flex justify-center col-span-2 gap-2'>
                 <label htmlFor="incoming">
                   <span className='dark:text-white'>Recebimento</span>
@@ -88,7 +89,7 @@ const handleChange = (e) =>{
                   <label htmlFor="category">
                     <span className='dark:text-white'>Categoria</span>
                   </label>
-                  <select value={formData.title} required onChange={handleChange} className='dark:text-white bg-gray-100 dark:bg-gray-800 focus:outline-none text-center' name="category" id="category">
+                  <select value={formData.title} required onChange={handleChange} className='dark:text-white bg-gray-100 dark:bg-gray-800 focus:outline-none text-center' name="title" id="category">
                     <option value="">Categoria</option>
                     <option value="contas-residenciais">Residência (luz,água)</option>
                     <option value="condução">Condução</option>
@@ -110,7 +111,7 @@ const handleChange = (e) =>{
                 
                   )}
                   <label htmlFor="value">
-                    <span className='dark:text-white'>Valor de recebimento</span>
+                    <span className='dark:text-white'>Valor da transação</span>
                   </label>
                   <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
                     dark:border-slate-700 rounded-lg p-1.5 
