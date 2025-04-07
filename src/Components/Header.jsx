@@ -7,17 +7,19 @@ import { NavLink } from 'react-router';
 
 
 const Header = () => {
+  
   const [theme, setTheme] = useState(localStorage.getItem('theme' || 'light'))
   const [sideBar, setSideBar] = useState(false)
 
   useEffect(()=>{
     if(theme === 'light'){
       document.documentElement.classList.add('dark')
-      
     }
+
     else{
       document.documentElement.classList.remove('dark')
     }
+
     localStorage.setItem('theme', theme)
   },[theme])
 
@@ -45,10 +47,11 @@ const Header = () => {
           <ol className='flex flex-col gap-5 items-center'>
             <li className='flex items-center gap-2'><LayoutDashboard size={20}/><NavLink to='/' className={({isActive})=>
             isActive ? 'text-sky-300' : ''}>Dashboards</NavLink></li>
-            <li className='flex items-center gap-2'><BarChart size={20} /><NavLink to='graphics' className={({isActive})=>
+            <li className='flex items-center gap-2'><BarChart size={20} /><NavLink to='/graphics' className={({isActive})=>
             isActive ? 'text-sky-300' : ''}>Gráficos</NavLink></li>
-            <li className='flex items-center gap-2'><Coins size={20}/>Transações</li>
-            <li className='flex items-center gap-2'><PlusCircle size={20}/><NavLink to='/newtransaction' className={({isActive})=>
+            <li className='flex items-center gap-2'><Coins size={20}/><NavLink className={({isActive})=>
+            isActive ? 'text-sky-300' : ''} to='/transactions'>Transações</NavLink></li>
+            <li className='flex items-center gap-2'><PlusCircle size={20}/><NavLink  to='/newtransaction' className={({isActive})=>
             isActive ? 'text-sky-300' : ''}>Adicionar Transação</NavLink></li>
           </ol>
         </aside>

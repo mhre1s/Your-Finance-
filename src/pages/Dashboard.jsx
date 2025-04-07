@@ -3,26 +3,25 @@ import Header from '../Components/Header'
 import TransactionCard from '../Components/TransactionCard'
 import TransactionRedCard from '../Components/TransactionRedCard'
 import TransactionNeutralCard from '../Components/TransactionNeutralCard'
+import { db } from '../firebaseconfig'
+import { getDocs, collection } from 'firebase/firestore'
+import useTransactions from '../Hooks/useTransactions'
+
 const Dashboard = () => {
-  const [receipts, setReceipts] = useState(900)
-  const [expenses, setExpenses] = useState(780)
-  const [amount, setAmount] = useState(0)
-  const transactions = [
-    {id: 1, type: 'Despesa', title: 'Conta de luz', amount: 170, date:'25/02/25'},
-    {id: 1, type: 'Recebimento', title: 'Ações Trisul', amount: 195.76, date:'27/02/25'},
-    {id: 1, type: 'Recebimento', title: 'Venda de mouse', amount: 327.52, date:'21/02/25'},
-    {id: 1, type: 'Despesa', title: 'Conta de água', amount: 192.11, date:'10/02/25'},
-  ]
-  useEffect(()=>{
-    setAmount(receipts - expenses)
-  },[receipts,expenses])
+
+  const { transactionsList, lastFour, error, filteredReceipts, filteredExpenses } = useTransactions()
+  const reducedReceipts = filteredReceipts.reduce((acc, val)=>  acc + Number(val.value),0)
+  const reducedExpenses = filteredExpenses.reduce((acc, val)=>  acc + Number(val.value),0)
+
+  const amount = reducedReceipts - reducedExpenses
+
   return (
     <div className='dark:bg-gray-950 min-h-screen bg-amber-50 flex flex-col'>
       <Header/>
       <div className='flex flex-col items-center justify-center gap-10 grow mt-10'>
         <div className='flex flex-col md:flex-row justify-center items-center gap-10'>
-          <TransactionCard receipts={receipts}/>
-          <TransactionRedCard expenses={expenses} />
+          <TransactionCard receipts={reducedReceipts}/>
+          <TransactionRedCard expenses={reducedExpenses} />
         </div>
         <div>
           <TransactionNeutralCard amount={amount}/>
@@ -39,11 +38,14 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {transactions.map((transaction)=>(
+              {lastFour.map((transaction)=>(
                 <tr key={transaction.id}>
                   <td className="px-6 py-3">{transaction.type}</td>
                   <td className="px-6 py-3">{transaction.title}</td>
-                  <td className="px-6 py-3">{transaction.amount.toFixed(2)}</td>
+                  <td className="px-6 py-3"> {new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                    }).format(transaction.value)}</td>
                   <td className="px-6 py-3">{transaction.date}</td>
                 </tr>
               ))}

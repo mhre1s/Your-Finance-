@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.jsx'
 import Dashboard from './pages/Dashboard.jsx';
 import NewTransaction from './pages/NewTransaction.jsx';
+import Transactions from './pages/Transactions.jsx';
 
 createRoot(document.getElementById('root')).render(
   
@@ -12,6 +13,7 @@ createRoot(document.getElementById('root')).render(
         <Routes>
           <Route path='/' element={<Dashboard/>}/>
           <Route path='newtransaction' element={<NewTransaction/>}/>
+          <Route path='transactions' element={<Transactions/>} />
         </Routes>
       </BrowserRouter>
   
