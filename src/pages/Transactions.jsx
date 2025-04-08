@@ -1,35 +1,36 @@
 import React, { useState, useEffect } from 'react'
-import { db } from '../firebaseconfig'
-import { collection, getDocs } from 'firebase/firestore'
+import useTransactions from '../Hooks/useTransactions'
+import Header from '../Components/Header'
 
 const Transactions = () => {
-  const [transactionsList, setTransactionsList] = useState([])
-  useEffect(()=>{
-    const fetchData = async()=>{
-      try {
-        const query = await getDocs(collection(db,'transactions'));
-        const data = query.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }))
-        setTransactionsList(data)
-      } 
-      catch (error) {
-        console.log('Erro ao buscar dados', error)
-      }
-    }
-    fetchData()
-  }, [])
-  console.log(transactionsList)
+
+  const { transactionsList, error, filteredReceipts, filteredExpenses, loading} = useTransactions()
+
   return (
-    <div>
-      <ul>
-        {transactionsList.map(transaction =>(
-          <li key={transaction.id}>
-          {transaction.type} - {transaction.title} - {Number(transaction.value).toFixed(2)} - {transaction.date}
-          </li>
+    <div className='dark:bg-gray-950 min-h-screen bg-white flex flex-col dark:text-white'>
+      <Header/>
+        <h1 className='text-center text-2xl mt-10'>Histórico de transações</h1>
+        <div className='flex justify-center mt-20'>
+          <ul className='w-full flex flex-wrap gap-5 justify-center'>
+           
+            
+            {transactionsList.map((transaction, index) =>(
+            
+              <li className='opacity-0 dark:bg-gray-800 bg-gray-100 shadow-slate-500 dark:border-slate-700 border-1 
+              border-solid border-slate-200 dark:shadow-slate-700 shadow-sm p-4 flex flex-col items-center 
+              justify-center gap-5 h-68 w-68 rounded-lg animate-slideLeft duration-300 hover:scale-105 hover:brightness-120' 
+              style={{ animationDelay: `${index * 200}ms` }} key={transaction.id}>
+              
+               <span>Tipo: {transaction.type}</span>
+               <span>Data: {transaction.date}</span>
+               <span>Título: {transaction.title}</span>
+               <span>Valor: {Number(transaction.value).toFixed(2)}</span>
+              </li>
+            
+            
         ))}
       </ul>
+        </div>
     </div>
   )
 }

@@ -10,10 +10,12 @@ const useTransactions = () => {
     const [filteredReceipts, setFilteredReceipts] = useState([])
     const [filteredExpenses, setFilteredExpenses] = useState([])
     const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
 
     useEffect(()=>{
     const fetchData = async()=>{
       try {
+        setLoading(true)
         const query = await getDocs(collection(db,'transactions'));
         const data = query.docs.map(doc => ({
           id: doc.id,
@@ -32,11 +34,14 @@ const useTransactions = () => {
       catch (err) {
         setError(err)
       }
+      finally{
+        setLoading(false)
+      }
     }
     fetchData()
   }, [])
 
-    return {transactionsList, lastFour, error, filteredReceipts, filteredExpenses}
+    return {transactionsList, lastFour, error, filteredReceipts, filteredExpenses, loading}
 }
 
 export default useTransactions

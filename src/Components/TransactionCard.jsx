@@ -2,6 +2,10 @@ import React from 'react'
 import { ArrowUp } from "lucide-react"
 
 const TransactionCard = ({receipts}) => {
+  const formattedReceipts = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(receipts)
   return (
     <div>
       <div className='bg-green-700 rounded-xl w-72 h-40 text-white flex justify-center items-center flex-col gap-9'>
@@ -10,7 +14,7 @@ const TransactionCard = ({receipts}) => {
             <div className='bg-white rounded-4xl w-6 h-6'><ArrowUp className='text-green-700' size={24}/></div>
         </div>
         <div>
-            <h3 className='text-xl'>R${receipts.toFixed(2)}</h3>
+            <h3 className='text-xl'>{formattedReceipts}</h3>
         </div>
       </div>
     </div>

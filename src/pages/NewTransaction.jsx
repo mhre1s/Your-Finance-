@@ -50,7 +50,7 @@ const handleChange = (e) =>{
   })
 
   return (
-    <div className='bg-amber-50 dark:bg-gray-950 min-h-screen flex flex-col'>
+    <div className='bg-white dark:bg-gray-950 min-h-screen flex flex-col'>
         <Header/>
         <h2 className='text-center text-2xl mt-10 dark:text-white'>Adicionar transação</h2>
         <div className='flex justify-center mt-20'>
