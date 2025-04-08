@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import useTransactions from '../Hooks/useTransactions'
 import Header from '../Components/Header'
+import pencil from '../assets/icons8-editar (1).svg'
 
 const Transactions = () => {
 
@@ -20,11 +21,17 @@ const Transactions = () => {
               border-solid border-slate-200 dark:shadow-slate-700 shadow-sm p-4 flex flex-col items-center 
               justify-center gap-5 h-68 w-68 rounded-lg animate-slideLeft duration-300 hover:scale-105 hover:brightness-120' 
               style={{ animationDelay: `${index * 200}ms` }} key={transaction.id}>
-              
-               <span>Tipo: {transaction.type}</span>
-               <span>Data: {transaction.date}</span>
-               <span>Título: {transaction.title}</span>
-               <span>Valor: {Number(transaction.value).toFixed(2)}</span>
+                <div>
+                  <button>
+                    <img src={pencil} alt="editar" className='w-6 h-6' />
+
+                    
+                  </button>
+                </div>
+                <span>Tipo: {transaction.type}</span>
+                <span>Data: {transaction.date}</span>
+                <span>Título: {transaction.title}</span>
+                <span className={`${transaction.type === 'Recebimento' ? 'text-green-600' : 'text-red-500'}`}>Valor: {Number(transaction.value).toFixed(2)}</span>
               </li>
             
             

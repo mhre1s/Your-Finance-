@@ -61,11 +61,11 @@ const handleChange = (e) =>{
                 <label htmlFor="incoming">
                   <span className='dark:text-white'>Recebimento</span>
                 </label>
-                <input required type="radio" name="type" id="incoming" value="Recebimento" onChange={handleChange} checked={formData.type === 'recebimento'} />
+                <input required type="radio" name="type" id="incoming" value="Recebimento" onChange={handleChange} checked={formData.type === 'Recebimento'} />
                 <label htmlFor="expenses">
                   <span className='dark:text-white'>Despesa</span>
                 </label>
-                <input type="radio" required name="type" id="expenses" value="Despesa" onChange={handleChange} checked={formData.type === 'despesa'} />
+                <input type="radio" required name="type" id="expenses" value="Despesa" onChange={handleChange} checked={formData.type === 'Despesa'} />
               </div>
 
               {formData.type === 'Recebimento' && (
