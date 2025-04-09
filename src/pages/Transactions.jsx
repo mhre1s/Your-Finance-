@@ -26,7 +26,7 @@ const Transactions = () => {
                   <button className=' bg-gray-300 dark:bg-slate-700 p-1 rounded-lg cursor-pointer'>
                     <img src={blackPencil} alt="editar" className='w-6 h-6 text-white dark:invert' />
                   </button>
-                  <button className=' bg-red-500 dark:bg-red-600 rounded-lg w-8 cursor-pointer'>
+                  <button className=' bg-red-500 dark:bg-red-700 rounded-lg w-8 cursor-pointer'>
                     <img className='dark:invert pl-1' src={lixeira} alt="excluir" />
                   </button>
                 </div>
