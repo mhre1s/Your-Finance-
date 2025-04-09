@@ -3,9 +3,10 @@ import useTransactions from '../Hooks/useTransactions'
 import Header from '../Components/Header'
 import blackPencil from '../assets/icons-black.svg'
 import lixeira from '../assets/lixeira.svg'
+import ConfirmButton from '../Components/ConfirmButton'
 
 const Transactions = () => {
-
+  const [deleteModal, setDeleteModal] = useState(false)
   const { transactionsList, error, filteredReceipts, filteredExpenses, loading} = useTransactions()
 
   return (
@@ -13,9 +14,25 @@ const Transactions = () => {
       <Header/>
         <h1 className='text-center text-2xl mt-10'>Histórico de transações</h1>
         <div className='flex justify-center mt-20'>
-          <ul className='w-full flex flex-wrap gap-5 justify-center'>
-           
+          {deleteModal && (
+            <>
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
+            <div className='fixed z-50 inset-0 flex items-center justify-center animate-center'>
+              <div className=' flex flex-col justify-evenly fixed backdrop-blur-sm
+              dark:bg-gray-900 bg-white dark:text-white z-50 border-slate-300
+              dark:border-slate-800 border-2 p-6 rounded-xl max-w-lg gap-10'>
+                <h2 className='text-xl'>Realmente deseja remover esta transação?</h2>
+                <div className='flex justify-around'>
+                  <ConfirmButton />
+                  <ConfirmButton onClick={() => setDeleteModal(false)} className=' bg-red-700'>Cancelar</ConfirmButton>
+                </div>
+              </div>
+            </div>
+            </>
             
+          )}
+          
+          <ul className='w-full flex flex-wrap gap-5 justify-center'>
             {transactionsList.map((transaction, index) =>(
             
               <li className='opacity-0 dark:bg-gray-800 bg-gray-100 shadow-slate-500 dark:border-slate-700 border-1 
@@ -26,7 +43,7 @@ const Transactions = () => {
                   <button className=' bg-gray-300 dark:bg-slate-700 p-1 rounded-lg cursor-pointer'>
                     <img src={blackPencil} alt="editar" className='w-6 h-6 text-white dark:invert' />
                   </button>
-                  <button className=' bg-red-500 dark:bg-red-700 rounded-lg w-8 cursor-pointer'>
+                  <button onClick={() => setDeleteModal(true)} className=' bg-red-500 dark:bg-red-700 rounded-lg w-8 cursor-pointer'>
                     <img className='dark:invert pl-1' src={lixeira} alt="excluir" />
                   </button>
                 </div>

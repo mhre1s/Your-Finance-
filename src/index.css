@@ -16,6 +16,18 @@
 }
 
 @theme{
+    --animate-center: center 1s ease-in-out forwards;
+    @keyframes center{
+        from{
+            opacity: 0;
+        }
+        to{
+            opacity: 1;
+        }
+    }
+}
+
+@theme{
     --animate-slideUp: slideUp 1.5s ease-in-out;
     @keyframes slideUp{
         0%{
