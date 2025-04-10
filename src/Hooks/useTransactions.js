@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react"
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore'
+import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore'
 import { db } from '../firebaseconfig'
 
 const useTransactions = () => {
@@ -50,7 +50,17 @@ const useTransactions = () => {
     }
 }
 
-    return {transactionsList, lastFour, error, filteredReceipts, filteredExpenses, loading, deleteTransaction}
+const updateTransaction = async(id) =>{
+  const docUpdated = doc(db, 'transactions', id);
+  try {
+    await updateDoc(docUpdated, newData)
+  } catch (error) {
+    console.error('Documento atualizado')
+  }
+}
+
+    return {transactionsList, lastFour, error, 
+      filteredReceipts, filteredExpenses, loading, deleteTransaction, updateTransaction}
 }
 
 export default useTransactions

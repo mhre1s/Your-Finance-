@@ -7,12 +7,17 @@ import ConfirmButton from '../Components/ConfirmButton'
 
 const Transactions = () => {
   const [deleteModal, setDeleteModal] = useState(false)
+  const [updateModal, setUpdateModal] = useState(false)
   const [getId, setGetId] = useState(null)
-  const { transactionsList, filteredReceipts, filteredExpenses,deleteTransaction} = useTransactions()
+  const { transactionsList, filteredReceipts, filteredExpenses,deleteTransaction, updateTransaction} = useTransactions()
 
   const handleDeleteClick = (id) =>{
     setDeleteModal(true)
     setGetId(id)
+  }
+
+  const handleUpdateClick = () => {
+    setUpdateModal(true)
   }
 
   const confirmDelete = () =>{
