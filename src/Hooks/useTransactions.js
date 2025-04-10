@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react"
-import { collection, getDocs } from 'firebase/firestore'
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore'
 import { db } from '../firebaseconfig'
 
 const useTransactions = () => {
@@ -41,7 +41,16 @@ const useTransactions = () => {
     fetchData()
   }, [])
 
-    return {transactionsList, lastFour, error, filteredReceipts, filteredExpenses, loading}
+  const deleteTransaction = async (id) => {
+    try {
+        await deleteDoc(doc(db, 'transactions', id))
+        setTransactionsList(prev => prev.filter(trs => trs.id !== id))
+    } catch (error) {
+        console.error('Erro ao deletar', error)
+    }
+}
+
+    return {transactionsList, lastFour, error, filteredReceipts, filteredExpenses, loading, deleteTransaction}
 }
 
 export default useTransactions

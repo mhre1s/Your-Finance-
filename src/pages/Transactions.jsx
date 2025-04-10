@@ -7,7 +7,21 @@ import ConfirmButton from '../Components/ConfirmButton'
 
 const Transactions = () => {
   const [deleteModal, setDeleteModal] = useState(false)
-  const { transactionsList, error, filteredReceipts, filteredExpenses, loading} = useTransactions()
+  const [getId, setGetId] = useState(null)
+  const { transactionsList, filteredReceipts, filteredExpenses,deleteTransaction} = useTransactions()
+
+  const handleDeleteClick = (id) =>{
+    setDeleteModal(true)
+    setGetId(id)
+  }
+
+  const confirmDelete = () =>{
+    if(getId){
+      deleteTransaction(getId)
+      setDeleteModal(false)
+      setGetId(null)
+    }
+  }
 
   return (
     <div className='dark:bg-gray-950 min-h-screen bg-white flex flex-col dark:text-white'>
@@ -23,8 +37,8 @@ const Transactions = () => {
               dark:border-slate-800 border-2 p-6 rounded-xl max-w-lg gap-10'>
                 <h2 className='text-xl'>Realmente deseja remover esta transação?</h2>
                 <div className='flex justify-around'>
-                  <ConfirmButton />
-                  <ConfirmButton onClick={() => setDeleteModal(false)} className=' bg-red-700'>Cancelar</ConfirmButton>
+                  <ConfirmButton onClick={confirmDelete}>Confirmar</ConfirmButton>
+                  <ConfirmButton onClick={() => setDeleteModal(false)} className=' bg-red-500 dark:bg-red-700'>Cancelar</ConfirmButton>
                 </div>
               </div>
             </div>
@@ -43,7 +57,7 @@ const Transactions = () => {
                   <button className=' bg-gray-300 dark:bg-slate-700 p-1 rounded-lg cursor-pointer'>
                     <img src={blackPencil} alt="editar" className='w-6 h-6 text-white dark:invert' />
                   </button>
-                  <button onClick={() => setDeleteModal(true)} className=' bg-red-500 dark:bg-red-700 rounded-lg w-8 cursor-pointer'>
+                  <button onClick={() => handleDeleteClick(transaction.id)} className=' bg-red-500 dark:bg-red-700 rounded-lg w-8 cursor-pointer'>
                     <img className='dark:invert pl-1' src={lixeira} alt="excluir" />
                   </button>
                 </div>
