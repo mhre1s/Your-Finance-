@@ -18,6 +18,7 @@ const NewTransaction = () => {
       const newTransaction = {...formData, 
         value:parsedValue, 
         createdAt: new Date()}
+      console.log(newTransaction)
       await addDoc(collection(db, "transactions"), newTransaction)
       alert('Lançamento realizado com sucesso')
       setFormData({

@@ -63,7 +63,7 @@ const Dashboard = () => {
                     style: 'currency',
                     currency: 'BRL'
                     }).format(transaction.value)}</td>
-                  <td className="px-6 py-3">{transaction.date}</td>
+                  <td className="px-6 py-3">{new Date(transaction.date).toLocaleDateString('pt-BR')}</td>
                 </tr>
               ))}
               <tr>

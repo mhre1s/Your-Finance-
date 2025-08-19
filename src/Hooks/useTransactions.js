@@ -50,17 +50,30 @@ const useTransactions = () => {
     }
 }
 
-const updateTransaction = async(id) =>{
-  const docUpdated = doc(db, 'transactions', id);
-  try {
-    await updateDoc(docUpdated, newData)
-  } catch (error) {
-    console.error('Documento atualizado')
+  const updateTransaction = async (id, updatedData) => {
+    const docRef = doc(db, "transactions", id);
+      await updateDoc(docRef, updatedData);
   }
-}
+
+const fetchTransactions = async () => {
+  try {
+    setLoading(true);
+    const query = await getDocs(collection(db,'transactions'));
+    const data = query.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    setTransactionsList(data);
+    
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchTransactions();
+}, []);
+
 
     return {transactionsList, lastFour, error, 
-      filteredReceipts, filteredExpenses, loading, deleteTransaction, updateTransaction}
+      filteredReceipts, filteredExpenses, loading, deleteTransaction, updateTransaction, fetchTransactions}
 }
 
 export default useTransactions
