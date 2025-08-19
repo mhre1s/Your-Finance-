@@ -15,6 +15,34 @@
     }
 }
 
+@theme {
+    --animate-slideRight: slideRight 0.3s ease-in-out forwards;
+
+    @keyframes slideRight {
+        from {
+            transform: translateX(-240px);
+        }
+
+        to {
+            transform: translateX(0);
+        }
+    }
+}
+
+@theme {
+    --animate-slideClose: slideClose 0.3s ease-in-out forwards;
+
+    @keyframes slideClose {
+        from {
+            transform: translateX(0px);
+        }
+
+        to {
+            transform: translateX(-260px);
+        }
+    }
+}
+
 @theme{
     --animate-center: center 1s ease-in-out forwards;
     @keyframes center{
