@@ -18,9 +18,10 @@ const Transactions = () => {
   const [editType, setEditType] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
 
-  const transactionsPerPage = 10
+  const transactionsPerPage = 8
   const initialIndex = (currentPage - 1) * transactionsPerPage  
   const finalIndex = currentPage * transactionsPerPage
+
   
   const confirmUpdate = async () => {
   if(getId){
@@ -63,118 +64,196 @@ const Transactions = () => {
   }
 
   return (
-    <div className='dark:bg-gray-950 min-h-screen bg-white flex flex-col dark:text-white'>
-      <Header/>
-        <h1 className='text-center text-2xl mt-10'>Histórico de transações</h1>
-        <div className='flex flex-col justify-center items-center mt-20 gap-5'>
+    <div className="dark:bg-gray-950 min-h-screen bg-white flex flex-col dark:text-white">
+      <Header />
+      <h1 className="text-center text-2xl mt-10">Histórico de transações</h1>
+      <div className="flex flex-col justify-center gap-5 items-center">
+        <div className="flex flex-col justify-center items-start mt-10 max-w-10/12 gap-5">
           {deleteModal && (
             <>
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
-            <div className='fixed z-50 inset-0 flex items-center justify-center animate-center'>
-              <div className=' flex flex-col justify-evenly fixed backdrop-blur-sm
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
+              <div className="fixed z-50 inset-0 flex items-center justify-center animate-center">
+                <div
+                  className=" flex flex-col justify-evenly fixed backdrop-blur-sm
               dark:bg-gray-900 bg-white dark:text-white z-50 border-slate-300
-              dark:border-slate-800 border-2 p-6 rounded-xl max-w-lg gap-10'>
-                <h2 className='text-xl'>Realmente deseja remover esta transação?</h2>
-                <div className='flex justify-around'>
-                  <ConfirmButton onClick={confirmDelete}>Confirmar</ConfirmButton>
-                  <ConfirmButton onClick={() => setDeleteModal(false)} className=' bg-red-500 dark:bg-red-700'>Cancelar</ConfirmButton>
+              dark:border-slate-800 border-2 p-6 rounded-xl max-w-lg gap-10"
+                >
+                  <h2 className="text-xl">
+                    Realmente deseja remover esta transação?
+                  </h2>
+                  <div className="flex justify-around">
+                    <ConfirmButton onClick={confirmDelete}>
+                      Confirmar
+                    </ConfirmButton>
+                    <ConfirmButton
+                      onClick={() => setDeleteModal(false)}
+                      className=" bg-red-500 dark:bg-red-700"
+                    >
+                      Cancelar
+                    </ConfirmButton>
+                  </div>
                 </div>
               </div>
-            </div>
             </>
-            
           )}
-          {
-            updateModal && (
-              <>
+          {updateModal && (
+            <>
               <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
-              <div className='fixed z-50 inset-0 flex items-center justify-center animate-center'>
-                <div className=' flex flex-col justify-evenly fixed backdrop-blur-sm
+              <div className="fixed z-50 inset-0 flex items-center justify-center animate-center">
+                <div
+                  className=" flex flex-col justify-evenly fixed backdrop-blur-sm
               dark:bg-gray-900 bg-white dark:text-white z-50 border-slate-300
-              dark:border-slate-800 border-2 p-6 rounded-xl max-w-lg gap-10'>
+              dark:border-slate-800 border-2 p-6 rounded-xl max-w-lg gap-10"
+                >
                   <input
-                    
                     type="text"
                     placeholder="Título"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
+                    className="border-slate-300 border-1 dark:text-white dark:border-1 text-center 
                     dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
+                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
                   />
                   <input
                     type="number"
                     placeholder="Valor"
                     value={editValue}
                     onChange={(e) => setEditValue(e.target.value)}
-                    className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
+                    className="border-slate-300 border-1 dark:text-white dark:border-1 text-center 
                     dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
+                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
                   />
                   <input
                     type="date"
                     placeholder="Data"
                     value={editDate}
                     onChange={(e) => setEditDate(e.target.value)}
-                    className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
+                    className="border-slate-300 border-1 dark:text-white dark:border-1 text-center 
                     dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
+                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
                   />
-                  <select value={editType} onChange={(e) => setEditType(e.target.value)} className='dark:text-white
+                  <select
+                    value={editType}
+                    onChange={(e) => setEditType(e.target.value)}
+                    className="dark:text-white
                   dark:bg-gray-900 focus:outline-none 
-                    text-center'>
+                    text-center"
+                  >
                     <option value="Recebimento">Recebimento</option>
                     <option value="Despesa">Despesa</option>
                   </select>
-                  <div className='flex justify-around'>
-                  <ConfirmButton onClick={confirmUpdate}>Confirmar</ConfirmButton>
-                  <ConfirmButton onClick={() => setUpdateModal(false)} className=' bg-red-500 dark:bg-red-700'>Cancelar</ConfirmButton>
+                  <div className="flex justify-around">
+                    <ConfirmButton onClick={confirmUpdate}>
+                      Confirmar
+                    </ConfirmButton>
+                    <ConfirmButton
+                      onClick={() => setUpdateModal(false)}
+                      className=" bg-red-500 dark:bg-red-700"
+                    >
+                      Cancelar
+                    </ConfirmButton>
                   </div>
                 </div>
               </div>
             </>
-            )
-          }
-          
-          <ul className='w-9/12 flex flex-wrap gap-5 justify-center'>
-            {transactionsList.slice(initialIndex, finalIndex).map((transaction, index) =>(
-            
-              <li className='opacity-0 dark:bg-gray-800 bg-gray-100 shadow-slate-500 dark:border-slate-700 border-1 
+          )}
+          <div>
+            <input
+              type="text"
+              name="search"
+              id="search"
+              placeholder="Busca por título"
+              className="w-68 border-slate-300 border-1 dark:text-white dark:border-1
+                    dark:border-slate-700 rounded-lg p-1.5 
+                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
+            />
+          </div>
+          <ul className="w-full grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-5 justify-center">
+            {transactionsList
+              .slice(initialIndex, finalIndex)
+              .map((transaction, index) => (
+                <li
+                  className="opacity-0 dark:bg-gray-800 bg-gray-100 shadow-slate-500 dark:border-slate-700 border-1 
               border-solid border-slate-200 dark:shadow-slate-700 shadow-sm p-4 flex flex-col items-center 
-              justify-center gap-5 h-68 w-68 rounded-lg animate-slideLeft duration-300 hover:scale-105 hover:brightness-110 dark:hover:brightness-125' 
-              style={{ animationDelay: `${index * 200}ms` }} key={transaction.id}>
-                <div className='flex justify-around w-full'>
-                  <button className=' bg-gray-300 dark:bg-slate-700 p-1 rounded-lg cursor-pointer'>
-                    <img src={blackPencil} alt="editar" className='w-6 h-6 text-white dark:invert' onClick={() => handleUpdateClick(transaction)} />
-                  </button>
-                  <button onClick={() => handleDeleteClick(transaction.id)} className=' bg-red-500 dark:bg-red-700 rounded-lg w-8 cursor-pointer'>
-                    <img className='dark:invert pl-1' src={lixeira} alt="excluir" />
-                  </button>
-                </div>
-                <span>Tipo: {transaction.type}</span>
-                <span>Data: {new Date(transaction.date).toLocaleDateString('pt-BR')}</span>
-                <span>Título: {transaction.title}</span>
-                <span className={`${transaction.type === 'Recebimento' ? 'text-green-600' : 'text-red-500'}`}>Valor: {Number(transaction.value).toFixed(2)}</span>
-              </li>    
-        ))}
-        </ul>
-        <div>
-          <button className={`transition-opacity duration-500 ${currentPage === 1 ? "opacity-50" : "opacity-100" }`} disabled = {currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
+              justify-center gap-5 h-68 w-68 rounded-lg animate-slideLeft duration-300 hover:scale-105 hover:brightness-110 dark:hover:brightness-125"
+                  style={{ animationDelay: `${index * 200}ms` }}
+                  key={transaction.id}
+                >
+                  <div className="flex justify-around w-full">
+                    <button className=" bg-gray-300 dark:bg-slate-700 p-1 rounded-lg cursor-pointer">
+                      <img
+                        src={blackPencil}
+                        alt="editar"
+                        className="w-6 h-6 text-white dark:invert"
+                        onClick={() => handleUpdateClick(transaction)}
+                      />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(transaction.id)}
+                      className=" bg-red-500 dark:bg-red-700 rounded-lg w-8 cursor-pointer"
+                    >
+                      <img
+                        className="dark:invert pl-1"
+                        src={lixeira}
+                        alt="excluir"
+                      />
+                    </button>
+                  </div>
+                  <span>Tipo: {transaction.type}</span>
+                  <span>
+                    Data:{" "}
+                    {new Date(transaction.date).toLocaleDateString("pt-BR")}
+                  </span>
+                  <span>Título: {transaction.title}</span>
+                  <span
+                    className={`${
+                      transaction.type === "Recebimento"
+                        ? "text-green-600"
+                        : "text-red-500"
+                    }`}
+                  >
+                    Valor: {Number(transaction.value).toFixed(2)}
+                  </span>
+                </li>
+              ))}
+          </ul>
+        </div>
+        <div className="mb-15">
+          <button
+            className={`transition-opacity duration-500 ${
+              currentPage === 1 ? "opacity-50" : "opacity-100"
+            }`}
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+          >
             <ChevronLeftIcon className="h-5 w-5" />
           </button>
-          <button className={` transition-opacity duration-500 ${
-                                currentPage === Math.ceil(transactionsList.length / transactionsPerPage)
-                                ? "opacity-50"
-                                : "opacity-100"
-                                }`} disabled = {currentPage === Math.ceil(transactionsList.length / transactionsPerPage)}
-                                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(transactionsList.length / transactionsPerPage)))}>
+          <button
+            className={` transition-opacity duration-500 ${
+              currentPage ===
+              Math.ceil(transactionsList.length / transactionsPerPage)
+                ? "opacity-50"
+                : "opacity-100"
+            }`}
+            disabled={
+              currentPage ===
+              Math.ceil(transactionsList.length / transactionsPerPage)
+            }
+            onClick={() =>
+              setCurrentPage((prev) =>
+                Math.min(
+                  prev + 1,
+                  Math.ceil(transactionsList.length / transactionsPerPage)
+                )
+              )
+            }
+          >
             <ChevronRightIcon className="h-5 w-5" />
           </button>
         </div>
-      
-        </div>
+      </div>
     </div>
-  )
+  );
 }
 
 export default Transactions
