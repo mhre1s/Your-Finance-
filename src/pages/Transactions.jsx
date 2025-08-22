@@ -11,7 +11,7 @@ const Transactions = () => {
   const [deleteModal, setDeleteModal] = useState(false)
   const [updateModal, setUpdateModal] = useState(false)
   const [getId, setGetId] = useState(null)
-  const { transactionsList, filteredReceipts, filteredExpenses,deleteTransaction, updateTransaction, fetchTransactions, loading} = useTransactions()
+  const { transactionsList,deleteTransaction, updateTransaction, fetchTransactions, loading} = useTransactions()
 
   const [editTitle, setEditTitle] = useState('')
   const [editValue, setEditValue] = useState('')
@@ -19,9 +19,20 @@ const Transactions = () => {
   const [editType, setEditType] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [search, setSearch] = useState('')
-  const filteredTitle = transactionsList.filter(transaction =>
-    transaction.title.toLowerCase().includes(search.toLowerCase())
+
+  const filteredTitle = transactionsList.filter(transaction =>{
+    const matchesTitle = transaction.title
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchesType = editType ? transaction.type === editType : true;
+    const matchesDate = editDate && !isNaN(new Date(editDate).getTime())
+    ? transaction.date === editDate
+    : true;
+    return matchesTitle && matchesDate && matchesType
+    }
   )
+  
+
   const [filter, setFilter] = useState(false)
   const transactionsPerPage = 8
   const initialIndex = (currentPage - 1) * transactionsPerPage  
@@ -190,6 +201,7 @@ const Transactions = () => {
                     type="date"
                     name="date"
                     id="date"
+                    onChange={e => setEditDate(e.target.value)}
                     required
                   />
                   <select
@@ -249,8 +261,8 @@ const Transactions = () => {
                   </div>
                   <span>Tipo: {transaction.type}</span>
                   <span>
-                    Data:{" "}
-                    {new Date(transaction.date).toLocaleDateString("pt-BR")}
+                    Data: {transaction.date.split("-").reverse().join("/")}
+                    
                   </span>
                   <span>Título: {transaction.title}</span>
                   <span
@@ -281,19 +293,19 @@ const Transactions = () => {
             <button
               className={` transition-opacity duration-500 ${
                 currentPage ===
-                Math.ceil(transactionsList.length / transactionsPerPage)
+                Math.ceil(filteredTitle.length / transactionsPerPage)
                   ? "opacity-50"
                   : "opacity-100"
               }`}
               disabled={
                 currentPage ===
-                Math.ceil(transactionsList.length / transactionsPerPage)
+                Math.ceil(filteredTitle.length / transactionsPerPage)
               }
               onClick={() =>
                 setCurrentPage((prev) =>
                   Math.min(
                     prev + 1,
-                    Math.ceil(transactionsList.length / transactionsPerPage)
+                    Math.ceil(filteredTitle.length / transactionsPerPage)
                   )
                 )
               }
