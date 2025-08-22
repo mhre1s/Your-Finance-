@@ -10,7 +10,8 @@ const TransactionNeutralCard = ({amount}) => {
 
   return (
     <div>
-    <div className={`${amount > 0 ? 'bg-green-700' : 'bg-red-700'} animate-pulse rounded-xl w-70 h-40 text-white flex justify-center items-center flex-col gap-9 sm:w-90 sm:h-50`}>
+    <div className={`${amount > 0 ? 'bg-green-700' : 'bg-red-700'} animate-pulse rounded-xl w-72 h-40 
+    text-white flex justify-center items-center flex-col gap-9 md:w-90 md:h-50`}>
         <div className='flex gap-3'>
             <h2 className='text-xl'>Lucro/Prejuízo(mês)</h2>
             <div className='bg-white rounded-4xl w-6 h-6'>{amount > 0 ? <ArrowUp className='text-green-700' size={24}/> : <ArrowDown className='text-red-700' size={24}/>}</div>
