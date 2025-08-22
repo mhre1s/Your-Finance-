@@ -38,7 +38,7 @@ const Header = () => {
   }
   return (
     <>
-    <header className='dark:bg-gray-950 dark:shadow-slate-800 dark:text-white dark:border-slate-700 flex justify-between py-4 border-b-1 border-solid border-slate-50 shadow-md shadow-slate-100'>
+    <header className='dark:bg-gray-950 dark:shadow-slate-800 dark:text-white dark:border-slate-700 flex justify-between py-4 sm:px-8 px-3 border-b-1 border-solid border-slate-50 shadow-md shadow-slate-100'>
         <aside className={`z-50 w-full sm:w-64 absolute gap-14 flex flex-col top-0 left-0 h-screen dark:bg-slate-800 dark:border-slate-700 bg-gray-100 border-1 border-solid 
           border-slate-200 ${sideBar ? `block sm:animate-slideRight`: ` hidden sm:animate-slideClose`}`}>
           <div className='w-full flex justify-end'>
@@ -55,12 +55,12 @@ const Header = () => {
             isActive ? 'text-sky-300' : ''}>Adicionar Transação</NavLink></li>
           </ol>
         </aside>
-        <button onClick={handleSideBar} className='hover:cursor-pointer hover:rounded-md hover:bg-slate-100 duration-300 ml-8 dark:hover:bg-slate-800'>
+        <button onClick={handleSideBar} className='hover:cursor-pointer hover:rounded-md hover:bg-slate-100 duration-300 dark:hover:bg-slate-800'>
             <Menu size={28}/>
         </button>
         <h1 className='text-2xl'>Your Finance<span className='text-green-800'>$</span></h1>
-        <button onClick={changeTheme} className=' mr-8 hover:cursor-pointer hover:text-yellow-500 duration-300'>
-          {theme === 'light' ? <RiMoonClearFill  className='animate-slideLeft' size={25}/> : <RiSunFill  className='animate-slideLeft' size={25}/>}
+        <button onClick={changeTheme} className='hover:cursor-pointer hover:text-yellow-500 duration-300'>
+          {theme === 'light' ? <RiMoonClearFill  className='sm:animate-slideLeft' size={25}/> : <RiSunFill  className='sm:animate-slideLeft' size={25}/>}
         </button>
     </header>
     </>
