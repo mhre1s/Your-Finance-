@@ -4,6 +4,7 @@ import Header from '../Components/Header'
 import blackPencil from '../assets/icons-black.svg'
 import lixeira from '../assets/lixeira.svg'
 import ConfirmButton from '../Components/ConfirmButton'
+import { XMarkIcon } from "@heroicons/react/24/solid";
 import { FunnelIcon } from "@heroicons/react/24/outline";
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
 
@@ -28,6 +29,7 @@ const Transactions = () => {
     const matchesDate = editDate && !isNaN(new Date(editDate).getTime())
     ? transaction.date === editDate
     : true;
+    console.log(matchesDate);
     return matchesTitle && matchesDate && matchesType
     }
   )
@@ -78,7 +80,6 @@ const Transactions = () => {
       setGetId(null)
     }
   }
-  console.log(search)
   return (
     <div className="dark:bg-gray-950 min-h-screen bg-white flex flex-col dark:text-white">
       <Header />
@@ -174,7 +175,7 @@ const Transactions = () => {
             </>
           )}
           {!loading && (
-            <div className="flex justify-between w-full">
+            <div className="flex gap-5 justify-between w-full">
               <input
                 type="text"
                 value={search}
@@ -191,9 +192,20 @@ const Transactions = () => {
                 className="w-6 h-6 cursor-pointer"
               />
               {filter && (
-                
-                <div className="fixed top-60 right-12 sm:right-42 bg-white border-slate-200 dark:border-slate-700 dark:bg-gray-900 
-                                border p-4 rounded shadow-lg z-50 flex flex-col gap-3">
+                <div
+                  className="fixed top-60 right-12 sm:right-42 bg-white border-slate-200 dark:border-slate-700 dark:bg-gray-900 
+                                border p-4 rounded shadow-lg z-50 flex flex-col gap-3"
+                >
+                  <div className="flex justify-end">
+                    <button
+                      className=" flex items-center justify-center border-1
+                    border-solid border-red-500 bg-red-500 w-5 h-5 rounded-full
+                    cursor-pointer"
+                    onClick={() => setFilter((prev) => !prev)}>
+                      <XMarkIcon className=" text-white text-end" />
+                    </button>{" "}
+                  </div>
+
                   <input
                     className="border-slate-300 border-1 dark:text-white dark:border-1 text-center 
                     dark:border-slate-700 rounded-lg p-1.5 
@@ -201,9 +213,18 @@ const Transactions = () => {
                     type="date"
                     name="date"
                     id="date"
-                    onChange={e => setEditDate(e.target.value)}
+                    value={editDate}
+                    onChange={(e) => setEditDate(e.target.value)}
                     required
                   />
+                  {editDate && (
+                    <button
+                      onClick={() => setEditDate("")}
+                      className="text-sm px-2 py-1 bg-gray-300 dark:bg-gray-700 rounded"
+                    >
+                      Limpar data
+                    </button>
+                  )}
                   <select
                     value={editType}
                     onChange={(e) => setEditType(e.target.value)}
@@ -262,7 +283,6 @@ const Transactions = () => {
                   <span>Tipo: {transaction.type}</span>
                   <span>
                     Data: {transaction.date.split("-").reverse().join("/")}
-                    
                   </span>
                   <span>Título: {transaction.title}</span>
                   <span
@@ -280,7 +300,11 @@ const Transactions = () => {
         </div>
 
         {!loading && (
-          <div className="mb-15">
+          <div
+            className={`mb-15 ${
+              filteredTitle.length === 0 ? `hidden` : `block`
+            }`}
+          >
             <button
               className={`transition-opacity duration-500 ${
                 currentPage === 1 ? "opacity-50" : "opacity-100"

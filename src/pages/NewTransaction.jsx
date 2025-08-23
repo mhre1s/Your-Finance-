@@ -56,7 +56,7 @@ const handleChange = (e) =>{
         <h2 className='text-center text-2xl mt-10 dark:text-white'>Adicionar transação</h2>
         <div className='flex justify-center mt-20'>
           <form onSubmit={handleSubmit} className=' animate-slideUp grid grid-cols-2 items-center w-96 gap-y-5 p-8 
-          shadow-slate-500 dark:shadow-slate-800 bg-gray-100 shadow-md 
+          shadow-slate-500 dark:shadow-slate-500 bg-gray-100 shadow-sm
            dark:bg-gray-800 rounded-xl'>
               <div className=' flex justify-center col-span-2 gap-2'>
                 <label htmlFor="incoming">

@@ -38,7 +38,7 @@ const Header = () => {
   }
   return (
     <>
-    <header className='dark:bg-gray-950 dark:shadow-slate-800 dark:text-white dark:border-slate-700 flex justify-between py-4 sm:px-8 px-3 border-b-1 border-solid border-slate-50 shadow-md shadow-slate-100'>
+    <header className='dark:bg-gray-950 dark:shadow-slate-900 dark:text-white dark:border-slate-800 flex justify-between py-4 sm:px-8 px-3 border-b-1 border-solid border-slate-400 shadow-sm shadow-slate-200'>
         <aside className={`z-50 w-full sm:w-64 absolute gap-14 flex flex-col top-0 left-0 h-screen dark:bg-slate-800 dark:border-slate-700 bg-gray-100 border-1 border-solid 
           border-slate-200 ${sideBar ? `block sm:animate-slideRight`: ` hidden sm:animate-slideClose`}`}>
           <div className='w-full flex justify-end'>
