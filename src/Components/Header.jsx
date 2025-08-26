@@ -47,7 +47,7 @@ const Header = () => {
           <ol className='flex flex-col gap-5 items-center'>
             <li className='flex items-center gap-2'><LayoutDashboard size={20}/><NavLink to='/' className={({isActive})=>
             isActive ? 'text-sky-300' : ''}>Dashboards</NavLink></li>
-            <li className='flex items-center gap-2'><BarChart size={20} /><NavLink to='/graphics' className={({isActive})=>
+            <li className='flex items-center gap-2'><BarChart size={20} /><NavLink to='/charts' className={({isActive})=>
             isActive ? 'text-sky-300' : ''}>Gráficos</NavLink></li>
             <li className='flex items-center gap-2'><Coins size={20}/><NavLink className={({isActive})=>
             isActive ? 'text-sky-300' : ''} to='/transactions'>Transações</NavLink></li>
