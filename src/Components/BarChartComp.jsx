@@ -1,11 +1,24 @@
 import React from 'react'
+import { useState, useEffect } from "react";
 import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import useTransactions from "../Hooks/useTransactions";
 
-const BarChartComp = () => {
-    
+const BarChartComp = ({startDate, endDate}) => {
+  
+  {
+    /* filtrando os meses */
+  }
+
   const {transactionsList} = useTransactions()
-  const data = transactionsList.reduce((acc, trans)=>{
+
+  const filteredData = startDate && endDate ? transactionsList.filter(trs => {
+    return trs.date >= startDate && trs.date <= endDate 
+  }) : transactionsList
+  
+  {
+    /* agrupando os meses */
+  }
+  const data = filteredData.reduce((acc, trans)=>{
     const month = new Date(trans.date).toLocaleString("default",{month: "short", year: "numeric" })
     let monthData = acc.find(item => item.month === month )
     if (!monthData){
@@ -25,12 +38,14 @@ const BarChartComp = () => {
     }
     return acc
   }, [])
-  
+  {
+    /*ordenando os meses decrescentemente no gráfico*/
+  }
 data.sort((a, b) => a._date - b._date);
 
   return (
-    <BarChart width={930} height={500} data={data}>
-      <CartesianGrid stroke="#ccc" />
+    <BarChart width={830} height={500} data={data}>
+      <CartesianGrid stroke="#AAA" />
       <XAxis dataKey={"month"} />
       <YAxis />
       <Tooltip />
