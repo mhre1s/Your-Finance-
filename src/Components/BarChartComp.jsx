@@ -1,6 +1,15 @@
 import React from 'react'
 import { useState, useEffect } from "react";
-import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import useTransactions from "../Hooks/useTransactions";
 
 const BarChartComp = ({startDate, endDate}) => {
@@ -44,15 +53,17 @@ const BarChartComp = ({startDate, endDate}) => {
 data.sort((a, b) => a._date - b._date);
 
   return (
-    <BarChart width={830} height={500} data={data}>
-      <CartesianGrid stroke="#AAA" />
-      <XAxis dataKey={"month"} />
-      <YAxis />
-      <Tooltip />
-      <Legend />
-      <Bar dataKey="Recebimento" fill="#22C55E" barSize={14} />
-      <Bar dataKey="Despesa" fill="#EF4444" barSize={14} />
-    </BarChart>
+    <ResponsiveContainer width='100%' height={600}>
+      <BarChart data={data}>
+        <CartesianGrid stroke="#AAA" />
+        <XAxis dataKey={"month"} />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="Recebimento" fill="#22C55E" barSize={14} />
+        <Bar dataKey="Despesa" fill="#EF4444" barSize={14} />
+      </BarChart>
+    </ResponsiveContainer>
   );
 }
 

@@ -21,14 +21,18 @@ const Transactions = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [search, setSearch] = useState('')
 
+  const [filterDate, setFilterDate] = useState("");
+  const [filterType, setFilterType] = useState("");
+
   const filteredTitle = transactionsList.filter(transaction =>{
     const matchesTitle = transaction.title
       .toLowerCase()
       .includes(search.toLowerCase());
-    const matchesType = editType ? transaction.type === editType : true;
-    const matchesDate = editDate && !isNaN(new Date(editDate).getTime())
-    ? transaction.date === editDate
-    : true;
+    const matchesType = filterType ? transaction.type === filterType : true;
+    const matchesDate =
+      filterDate && !isNaN(new Date(filterDate).getTime())
+     ? transaction.date === filterDate
+     : true;
     console.log(matchesDate);
     return matchesTitle && matchesDate && matchesType
     }
@@ -213,8 +217,8 @@ const Transactions = () => {
                     type="date"
                     name="date"
                     id="date"
-                    value={editDate}
-                    onChange={(e) => setEditDate(e.target.value)}
+                    value={filterDate}
+                    onChange={(e) => setFilterDate(e.target.value)}
                     required
                   />
                   {editDate && (
@@ -226,8 +230,8 @@ const Transactions = () => {
                     </button>
                   )}
                   <select
-                    value={editType}
-                    onChange={(e) => setEditType(e.target.value)}
+                    value={filterType}
+                    onChange={(e) => setFilterType(e.target.value)}
                     className="border p-1 rounded dark:border-slate-700 dark:text-white border-slate-200 dark:bg-gray-900 
                    focus:outline-none"
                   >

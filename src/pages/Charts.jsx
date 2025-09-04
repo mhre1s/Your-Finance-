@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Header from "../Components/Header";
 import BarChartComp from '../Components/BarChartComp';
 import BarChartYearly from '../Components/BarChartYearly';
+import PieCharts from '../Components/PieCharts';
 
 
 
@@ -17,7 +18,7 @@ const Charts = () => {
 
       {/* seleção de gráficos mensal ou anual */}
 
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center px-15 ">
         <div className="mt-10 flex justify-evenly w-full">
           <button
             onClick={() =>
@@ -55,7 +56,7 @@ const Charts = () => {
             </label>
             <input
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-31 dark:bg-slate-800 bg-slate-200 rounded-lg p-1 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
+              className="w-31 dark:bg-slate-900 bg-slate-200 rounded-lg p-1 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
               type="date"
               name="date-start"
               id="date-start"
@@ -68,7 +69,7 @@ const Charts = () => {
             </label>
             <input
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-31 dark:bg-slate-800 bg-slate-200 rounded-lg p-1 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
+              className="w-31 dark:bg-slate-900 bg-slate-200 rounded-lg p-1 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
               type="date"
               name="date-end"
               id="date-end"
@@ -78,14 +79,19 @@ const Charts = () => {
         </div>
 
         {/*Gráficos de barra e de pizza*/}
-
-        <div className=" overflow-x-auto w-full">
-          <div className="mt-20 px-10 flex justify-center w-[830px]">
-            {currentChart === "mensal" ? (
-              <BarChartComp startDate={startDate} endDate={endDate} />
-            ) : (
-              <BarChartYearly startDate={startDate} endDate={endDate} />
-            )}
+        <div className="flex flex-col gap-6 xs:flex-row items-center w-full justify-center">
+          <div className="w-80 sm:w-10/12">
+            <div className="mt-20 p-5 flex justify-center overflow-x-auto sm:overflow-x-hidden rounded-lg">
+              {currentChart === "mensal" ? (
+                <BarChartComp startDate={startDate} endDate={endDate} />
+              ) : (
+                <BarChartYearly startDate={startDate} endDate={endDate} />
+              )}
+            </div>
+          </div>
+          <div className="w-80 flex flex-col mt-20 mb-20 xs:mb-0 p-2 rounded-lg">
+            <h4 className="text-center">Principais despesas (R$)</h4>
+            <PieCharts startDate = {startDate} endDate = {endDate} />
           </div>
         </div>
       </div>

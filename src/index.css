@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+    --breakpoint-xs: 1380px;
+}
 
 @theme{
     --animate-slideLeft: slideLeft 1.5s ease-in-out forwards;
