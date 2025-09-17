@@ -7,7 +7,7 @@ O objetivo é facilitar o acompanhamento de entradas e saídas, trazendo mais cl
 
 ## 🚀 Demonstração
 
-🔗 [Acesse aqui o projeto online](https://seu-deploy.netlify.app)
+🔗 [Acesse aqui o projeto online](https://yourfinancess.netlify.app/)
 
 <p align="center">
   <img src="./prints/trsList.png" alt="Preview do Projeto" width="800"/>
