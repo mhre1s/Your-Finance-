@@ -36,9 +36,29 @@ O objetivo é facilitar o acompanhamento de entradas e saídas, trazendo mais cl
 
 ---
 
-## 📦 Como Rodar o Projeto Localmente
+## Como Rodar o Projeto
 
-1. Baixar o NodeJS na máquina
+### Pré-requisitos (para rodar local)
+
+- Node.js instalado
+- Gerenciador de pacotes (npm ou yarn)
+
+### Passos
+
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu-usuario/nome-do-repo.git
+   git clone https://github.com/seu-usuario/seu-repositorio.git
+   ```
+2. Navegue até a pasta do projeto:
+   ```bash
+   cd seu-repositorio
+   ```
+3. Instale as dependências:
+   ```bash
+   npm install
+   ```
+4. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+5. Acesse o aplicativo no navegador em [http://localhost:5173](http://localhost:5173).
