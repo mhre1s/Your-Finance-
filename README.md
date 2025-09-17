@@ -6,11 +6,10 @@ O objetivo é facilitar o acompanhamento de entradas e saídas, trazendo mais cl
 ---
 
 ## 🚀 Demonstração
-<!-- Substitua pela URL do deploy -->
+
 🔗 [Acesse aqui o projeto online](https://seu-deploy.netlify.app)
 
 <p align="center">
-  <!-- Substitua pela captura de tela do projeto -->
   <img src="screenshot.png" alt="Preview do Projeto" width="800"/>
 </p>
 
@@ -23,7 +22,7 @@ O objetivo é facilitar o acompanhamento de entradas e saídas, trazendo mais cl
 - Filtro por datas  
 - Exibição de saldo atualizado em tempo real  
 - Interface responsiva  
-- Gráficos de acompanhamento financeiro (se já tiver)  
+- Gráficos de acompanhamento financeiro 
 
 ---
 
@@ -39,6 +38,7 @@ O objetivo é facilitar o acompanhamento de entradas e saídas, trazendo mais cl
 
 ## 📦 Como Rodar o Projeto Localmente
 
+1. Baixar o NodeJS na máquina
 1. Clone o repositório:
    ```bash
    git clone https://github.com/seu-usuario/nome-do-repo.git
