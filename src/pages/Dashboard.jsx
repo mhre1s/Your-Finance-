@@ -14,28 +14,28 @@ const Dashboard = () => {
   const amount = reducedReceipts - reducedExpenses
 
   return (
-    <div className='dark:bg-gray-950 min-h-screen bg-white flex flex-col'>
-      <Header/>
-      <div className='flex flex-col items-center justify-center gap-10 grow mt-10'>
+    <div className="dark:bg-gray-950 min-h-screen bg-white flex flex-col">
+      <Header />
+      <div className="flex flex-col items-center justify-center gap-10 grow mt-10">
         {loading && (
           <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 dark:border-white border-slate-950"></div>
         )}
-        {!loading &&(
+        {!loading && (
           <>
-           <div className='flex flex-col md:flex-row justify-center items-center gap-10'>
-              <TransactionCard receipts={reducedReceipts}/>
+            <div className="flex flex-col md:flex-row justify-center items-center gap-10">
+              <TransactionCard receipts={reducedReceipts} />
               <TransactionRedCard expenses={reducedExpenses} />
-          </div>
-        
-          <div>
-          <TransactionNeutralCard amount={amount}/>
-          </div>
+            </div>
+
+            <div>
+              <TransactionNeutralCard amount={amount} />
+            </div>
           </>
         )}
-       
-        <h4 className='dark:text-white text-2xl'>Últimas transações</h4>
-        <div className='border-1 border-solid border-slate-200 rounded-xl dark:border-gray-700'>
-          <table className='dark:text-white text-center rounded-xl dark:bg-gray-800 bg-slate-100'>
+
+        <h4 className="dark:text-white text-2xl">Últimas transações</h4>
+        <div className="border-1 border-solid border-slate-200 rounded-xl w-full max-w-2xl dark:border-gray-700 overflow-x-auto mb-4">
+          <table className="dark:text-white text-center rounded-xl w-full dark:bg-gray-800 bg-slate-100 overflow-x-auto">
             <thead>
               <tr>
                 <th className="px-6 py-3">Tipo</th>
@@ -45,35 +45,50 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {loading &&(
-                [1,2,3,4].map((_,i)=>(
-                  <tr key={i} className='animate-bounce'>
-                    <td className="px-6 py-3"><div className="h-2 bg-gray-400 rounded w-20 mx-auto" /></td>
-                    <td className="px-6 py-3"><div className="h-2 bg-gray-400 rounded w-20 mx-auto" /></td>
-                    <td className="px-6 py-3"><div className="h-2 bg-gray-400 rounded w-20 mx-auto" /></td>
-                    <td className="px-6 py-3"><div className="h-2 bg-gray-400 rounded w-20 mx-auto" /></td>
+              {loading &&
+                [1, 2, 3, 4].map((_, i) => (
+                  <tr key={i} className="animate-bounce">
+                    <td className="px-6 py-3">
+                      <div className="h-2 bg-gray-400 rounded w-20 mx-auto" />
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="h-2 bg-gray-400 rounded w-20 mx-auto" />
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="h-2 bg-gray-400 rounded w-20 mx-auto" />
+                    </td>
+                    <td className="px-6 py-3">
+                      <div className="h-2 bg-gray-400 rounded w-20 mx-auto" />
+                    </td>
                   </tr>
-                ))
-              )}
-              {lastFour.map((transaction)=>(
+                ))}
+              {lastFour.map((transaction) => (
                 <tr key={transaction.id}>
                   <td className="px-6 py-3">{transaction.type}</td>
-                  <td className="px-6 py-3">{transaction.title === "Outros" ? transaction.expenseName : transaction.title}</td>
-                  <td className="px-6 py-3"> {new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                    }).format(transaction.value)}</td>
-                  <td className="px-6 py-3">{new Date(transaction.date).toLocaleDateString('pt-BR')}</td>
+                  <td className="px-6 py-3">
+                    {transaction.title === "Outros"
+                      ? transaction.expenseName
+                      : transaction.title}
+                  </td>
+                  <td className="px-6 py-3">
+                    {" "}
+                    {new Intl.NumberFormat("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    }).format(transaction.value)}
+                  </td>
+                  <td className="px-6 py-3">
+                    {new Date(transaction.date).toLocaleDateString("pt-BR")}
+                  </td>
                 </tr>
               ))}
-              <tr>
-              </tr>
+              <tr></tr>
             </tbody>
           </table>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default Dashboard
