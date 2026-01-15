@@ -1,87 +1,97 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import Header from "../Components/Header";
-import BarChartComp from '../Components/BarChartComp';
-import BarChartYearly from '../Components/BarChartYearly';
-import PieCharts from '../Components/PieCharts';
-
-
+import BarChartComp from "../Components/BarChartComp";
+import BarChartYearly from "../Components/BarChartYearly";
+import PieCharts from "../Components/PieCharts";
+import {
+  Calendar,
+  BarChart3,
+  PieChart as PieChartIcon,
+  ArrowRight,
+} from "lucide-react";
 
 const Charts = () => {
-
-  const [currentChart, setCurrentChart] = useState('mensal')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
+  const [currentChart, setCurrentChart] = useState("mensal");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   return (
-    <div className="dark:text-white dark:bg-gray-950 min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
       <Header />
 
-      {/* seleção de gráficos mensal ou anual */}
+      <main className="max-w-7xl mx-auto px-6 py-10">
+        {/* Título e Seletor Principal */}
+        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div>
+            <h1 className="text-3xl font-black tracking-tighter italic">
+              Análise de <span className="text-sky-500 not-italic">Dados.</span>
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+              Visualize seu desempenho financeiro visualmente.
+            </p>
+          </div>
 
-      <div className="flex flex-col justify-center items-center px-15 ">
-        <div className="mt-10 flex justify-evenly w-full">
-          <button
-            onClick={() =>
-              currentChart !== "mensal"
-                ? setCurrentChart("mensal")
-                : setCurrentChart("mensal")
-            }
-            className={`text-xl cursor-pointer ${
-              currentChart === "mensal" ? `dark:text-sky-300 text-sky-600` : ``
-            }`}
-          >
-            <h2>Mensal</h2>
-          </button>
+          {/* Toggle Mensal/Anual Estilizado */}
+          <div className="flex bg-slate-200/50 dark:bg-gray-900 p-1.5 rounded-2xl border border-slate-200 dark:border-gray-800 w-fit">
+            <button
+              onClick={() => setCurrentChart("mensal")}
+              className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${
+                currentChart === "mensal"
+                  ? "bg-white dark:bg-gray-800 shadow-lg text-sky-600 dark:text-sky-400"
+                  : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+              }`}
+            >
+              Mensal
+            </button>
+            <button
+              onClick={() => setCurrentChart("anual")}
+              className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${
+                currentChart === "anual"
+                  ? "bg-white dark:bg-gray-800 shadow-lg text-sky-600 dark:text-sky-400"
+                  : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+              }`}
+            >
+              Anual
+            </button>
+          </div>
+        </header>
 
-          <button
-            onClick={() =>
-              currentChart === "anual"
-                ? setCurrentChart("anual")
-                : setCurrentChart("anual")
-            }
-            className={`text-xl cursor-pointer ${
-              currentChart === "anual" ? `dark:text-sky-300 text-sky-600` : ``
-            }`}
-          >
-            <h2>Anual</h2>
-          </button>
-        </div>
-
-        {/* datas de início e fim */}
-
-        <div className="flex gap-4 w-full justify-center mt-10">
-          <div className="flex gap-3">
-            <label className="mt-1" htmlFor="date-start">
-              <span>De:</span>
-            </label>
+        {/* Filtros de Data Premium */}
+        <div className="flex flex-wrap items-center gap-4 mb-10 p-4 bg-white dark:bg-gray-900/50 rounded-[2rem] border border-slate-200 dark:border-gray-800 w-fit mx-auto md:mx-0">
+          <div className="flex items-center gap-3 px-4">
+            <Calendar size={18} className="text-sky-500" />
             <input
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-31 dark:bg-slate-900 bg-slate-200 rounded-lg p-1 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
               type="date"
-              name="date-start"
-              id="date-start"
               value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="bg-transparent outline-none text-sm font-medium dark:text-white"
             />
           </div>
-          <div className="flex gap-3">
-            <label className="mt-1" htmlFor="date-end">
-              <span>Até:</span>
-            </label>
+          <ArrowRight size={16} className="text-slate-300" />
+          <div className="flex items-center gap-3 px-4">
             <input
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-31 dark:bg-slate-900 bg-slate-200 rounded-lg p-1 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
               type="date"
-              name="date-end"
-              id="date-end"
               value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="bg-transparent outline-none text-sm font-medium dark:text-white"
             />
           </div>
         </div>
 
-        {/*Gráficos de barra e de pizza*/}
-        <div className="flex flex-col gap-6 xs:flex-row items-center w-full justify-center">
-          <div className="w-80 sm:w-10/12">
-            <div className="mt-20 p-5 flex justify-center overflow-x-auto sm:overflow-x-hidden rounded-lg">
+        {/* Grid de Gráficos */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Gráfico Principal (Barras) - Ocupa 2 colunas */}
+          <div className="lg:col-span-2 bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-gray-800 shadow-xl shadow-slate-200/50 dark:shadow-none">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-2 bg-sky-100 dark:bg-sky-500/10 rounded-lg text-sky-600">
+                <BarChart3 size={20} />
+              </div>
+              <h3 className="font-bold tracking-tight">
+                Fluxo de Caixa ({currentChart})
+              </h3>
+            </div>
+
+            <div className="h-[350px] w-full flex items-center justify-center overflow-hidden">
               {currentChart === "mensal" ? (
                 <BarChartComp startDate={startDate} endDate={endDate} />
               ) : (
@@ -89,14 +99,34 @@ const Charts = () => {
               )}
             </div>
           </div>
-          <div className="w-80 flex flex-col mt-20 mb-20 xs:mb-0 p-2 rounded-lg">
-            <h4 className="text-center">Principais despesas (R$)</h4>
-            <PieCharts startDate = {startDate} endDate = {endDate} />
+
+          {/* Gráfico de Pizza - Ocupa 1 coluna */}
+          <div className="bg-white dark:bg-gray-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-gray-800 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col items-center">
+            <div className="flex items-center gap-3 mb-8 w-full text-left">
+              <div className="p-2 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg text-emerald-600">
+                <PieChartIcon size={20} />
+              </div>
+              <h3 className="font-bold tracking-tight">Distribuição</h3>
+            </div>
+
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+              Principais Despesas (R$)
+            </p>
+
+            <div className="h-[300px] w-full flex items-center justify-center">
+              <PieCharts startDate={startDate} endDate={endDate} />
+            </div>
+
+            <div className="mt-6 p-4 bg-slate-50 dark:bg-gray-800/50 rounded-2xl w-full text-center">
+              <span className="text-xs text-slate-500">
+                Dados baseados no período selecionado
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
-}
+};
 
-export default Charts
+export default Charts;

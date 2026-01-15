@@ -1,94 +1,143 @@
-import React from 'react'
-import Header from '../Components/Header'
-import TransactionCard from '../Components/TransactionCard'
-import TransactionRedCard from '../Components/TransactionRedCard'
-import TransactionNeutralCard from '../Components/TransactionNeutralCard'
-import useTransactions from '../Hooks/useTransactions'
+import React from "react";
+import Header from "../Components/Header";
+import TransactionCard from "../Components/TransactionCard";
+import TransactionRedCard from "../Components/TransactionRedCard";
+import TransactionNeutralCard from "../Components/TransactionNeutralCard";
+import useTransactions from "../Hooks/useTransactions";
 
 const Dashboard = () => {
+  const { lastFour, error, filteredReceipts, filteredExpenses, loading } =
+    useTransactions();
 
-  const { lastFour, error, filteredReceipts, filteredExpenses, loading} = useTransactions()
-  const reducedReceipts = filteredReceipts.reduce((acc, val)=>  acc + Number(val.value),0)
-  const reducedExpenses = filteredExpenses.reduce((acc, val)=>  acc + Number(val.value),0)
-
-  const amount = reducedReceipts - reducedExpenses
+  const reducedReceipts = filteredReceipts.reduce(
+    (acc, val) => acc + Number(val.value),
+    0
+  );
+  const reducedExpenses = filteredExpenses.reduce(
+    (acc, val) => acc + Number(val.value),
+    0
+  );
+  const amount = reducedReceipts - reducedExpenses;
 
   return (
-    <div className="dark:bg-gray-950 min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
       <Header />
-      <div className="flex flex-col items-center justify-center gap-10 grow mt-10">
-        {loading && (
-          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 dark:border-white border-slate-950"></div>
-        )}
-        {!loading && (
-          <>
-            <div className="flex flex-col md:flex-row justify-center items-center gap-10">
-              <TransactionCard receipts={reducedReceipts} />
-              <TransactionRedCard expenses={reducedExpenses} />
-            </div>
 
-            <div>
-              <TransactionNeutralCard amount={amount} />
-            </div>
-          </>
-        )}
+      <main className="max-w-6xl mx-auto px-4 py-8 md:py-12">
+        {/* Seção de Resumo (Cards) */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {loading ? (
+            // Skeleton loader para os cards
+            [1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-32 bg-slate-200 dark:bg-gray-800 animate-pulse rounded-2xl"
+              />
+            ))
+          ) : (
+            <>
+              <div className="md:order-1">
+                <TransactionCard receipts={reducedReceipts} />
+              </div>
+              <div className="md:order-3">
+                <TransactionRedCard expenses={reducedExpenses} />
+              </div>
+              <div className="md:order-2 scale-105">
+                {/* O saldo neutro fica no centro e levemente maior */}
+                <TransactionNeutralCard amount={amount} />
+              </div>
+            </>
+          )}
+        </section>
 
-        <h4 className="dark:text-white text-2xl">Últimas transações</h4>
-        <div className="border-1 border-solid border-slate-200 rounded-xl w-full max-w-2xl dark:border-gray-700 overflow-x-auto mb-4">
-          <table className="dark:text-white text-center rounded-xl w-full dark:bg-gray-800 bg-slate-100 overflow-x-auto">
-            <thead>
-              <tr>
-                <th className="px-6 py-3">Tipo</th>
-                <th className="px-6 py-3">Título</th>
-                <th className="px-6 py-3">Valor</th>
-                <th className="px-6 py-3">Data</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading &&
-                [1, 2, 3, 4].map((_, i) => (
-                  <tr key={i} className="animate-bounce">
-                    <td className="px-6 py-3">
-                      <div className="h-2 bg-gray-400 rounded w-20 mx-auto" />
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="h-2 bg-gray-400 rounded w-20 mx-auto" />
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="h-2 bg-gray-400 rounded w-20 mx-auto" />
-                    </td>
-                    <td className="px-6 py-3">
-                      <div className="h-2 bg-gray-400 rounded w-20 mx-auto" />
-                    </td>
-                  </tr>
-                ))}
-              {lastFour.map((transaction) => (
-                <tr key={transaction.id}>
-                  <td className="px-6 py-3">{transaction.type}</td>
-                  <td className="px-6 py-3">
-                    {transaction.title === "Outros"
-                      ? transaction.expenseName
-                      : transaction.title}
-                  </td>
-                  <td className="px-6 py-3">
-                    {" "}
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(transaction.value)}
-                  </td>
-                  <td className="px-6 py-3">
-                    {new Date(transaction.date).toLocaleDateString("pt-BR")}
-                  </td>
+        {/* Tabela de Transações */}
+        <section className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-slate-200 dark:border-gray-800 overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-100 dark:border-gray-800 flex justify-between items-center">
+            <h4 className="text-xl font-semibold">Últimas transações</h4>
+            <span className="text-xs font-medium bg-slate-100 dark:bg-gray-800 px-3 py-1 rounded-full uppercase tracking-wider opacity-70">
+              Recentes
+            </span>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="text-slate-400 dark:text-slate-500 text-sm uppercase tracking-wider">
+                  <th className="px-6 py-4 font-medium">Tipo</th>
+                  <th className="px-6 py-4 font-medium">Título</th>
+                  <th className="px-6 py-4 font-medium text-right">Valor</th>
+                  <th className="px-6 py-4 font-medium text-right">Data</th>
                 </tr>
-              ))}
-              <tr></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
+                {loading
+                  ? [1, 2, 3, 4].map((_, i) => (
+                      <tr key={i} className="animate-pulse">
+                        <td colSpan="4" className="px-6 py-4">
+                          <div className="h-4 bg-slate-200 dark:bg-gray-800 rounded w-full" />
+                        </td>
+                      </tr>
+                    ))
+                  : lastFour.map((transaction) => (
+                      <tr
+                        key={transaction.id}
+                        className="hover:bg-slate-50 dark:hover:bg-gray-800/50 transition-colors"
+                      >
+                        {/* ... dentro do map das transações ... */}
+                        <td className="px-6 py-4">
+                          <span
+                            className={`text-xs font-bold px-2 py-1 rounded capitalize ${
+                              transaction.type === "receita" ||
+                              transaction.type === "entrada" ||
+                              transaction.type === "Recebimento" // Adicionado aqui
+                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                                : "bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400"
+                            }`}
+                          >
+                            {transaction.type}
+                          </span>
+                        </td>
+
+                        <td className="px-6 py-4 font-medium">
+                          {transaction.title === "Outros"
+                            ? transaction.expenseName
+                            : transaction.title}
+                        </td>
+
+                        <td
+                          className={`px-6 py-4 text-right font-semibold ${
+                            transaction.type === "receita" ||
+                            transaction.type === "entrada" ||
+                            transaction.type === "Recebimento" // Adicionado aqui também
+                              ? "text-emerald-500"
+                              : "text-rose-500"
+                          }`}
+                        >
+                          {new Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          }).format(transaction.value)}
+                        </td>
+                        <td className="px-6 py-4 text-right text-slate-500 dark:text-slate-400 text-sm">
+                          {new Date(transaction.date).toLocaleDateString(
+                            "pt-BR"
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+              </tbody>
+            </table>
+          </div>
+
+          {!loading && lastFour.length === 0 && (
+            <div className="py-12 text-center text-slate-400">
+              Nenhuma transação encontrada.
+            </div>
+          )}
+        </section>
+      </main>
     </div>
   );
-}
+};
 
-export default Dashboard
+export default Dashboard;

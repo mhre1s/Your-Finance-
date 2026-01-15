@@ -1,70 +1,153 @@
-import React, { useEffect, useState } from 'react';
-import {Menu, BarChart, LayoutDashboard, Coins, PlusCircle} from 'lucide-react'
-import { XMarkIcon } from '@heroicons/react/24/solid';
-import { RiMoonClearFill, RiSunFill} from 'react-icons/ri';
-import { NavLink } from 'react-router';
-
-
+import React, { useEffect, useState } from "react";
+import {
+  Menu,
+  BarChart,
+  LayoutDashboard,
+  Coins,
+  PlusCircle,
+  X,
+} from "lucide-react";
+import { RiMoonClearFill, RiSunFill } from "react-icons/ri";
+import { NavLink } from "react-router";
 
 const Header = () => {
-  
-  const [theme, setTheme] = useState(localStorage.getItem('theme' || 'light'))
-  const [sideBar, setSideBar] = useState(false)
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [sideBar, setSideBar] = useState(false);
 
-  useEffect(()=>{
-    if(theme === 'light'){
-      document.documentElement.classList.add('dark')
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
     }
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
-    else{
-      document.documentElement.classList.remove('dark')
-    }
+  const changeTheme = (e) => {
+    e.preventDefault();
+    setTheme(theme === "light" ? "dark" : "light");
+  };
 
-    localStorage.setItem('theme', theme)
-  },[theme])
+  const handleSideBar = () => setSideBar(!sideBar);
 
-  const changeTheme = (e)=>{
-    e.preventDefault()
-    setTheme(theme === 'light' ? 'dark' : 'light')
-  }
-  const handleSideBar = () =>{
-    if(!sideBar){
-    setSideBar(true)
-    
-  }
-  else{
-    setSideBar(false)
-  }
-  }
   return (
     <>
-    <header className='dark:bg-gray-950 dark:shadow-slate-900 dark:text-white dark:border-slate-800 flex justify-between py-4 sm:px-8 px-3 border-b-1 border-solid border-slate-400 shadow-sm shadow-slate-200'>
-        <aside className={`z-50 w-full sm:w-64 absolute gap-14 flex flex-col top-0 left-0 h-screen dark:bg-slate-800 dark:border-slate-700 bg-gray-100 border-1 border-solid 
-          border-slate-200 ${sideBar ? `block sm:animate-slideRight`: ` hidden sm:animate-slideClose`}`}>
-          <div className='w-full flex justify-end'>
-            <button onClick={handleSideBar} className='m-3 cursor-pointer'><XMarkIcon className="h-6 w-6 hover:rounded-4xl text-red-400 dark:hover:bg-amber-50 duration-500 hover:bg-slate-400"/></button>
-          </div>
-          <ol className='flex flex-col gap-5 items-center'>
-            <li className='flex items-center gap-2'><LayoutDashboard size={20}/><NavLink to='/' className={({isActive})=>
-            isActive ? 'text-sky-300' : ''}>Dashboards</NavLink></li>
-            <li className='flex items-center gap-2'><BarChart size={20} /><NavLink to='/charts' className={({isActive})=>
-            isActive ? 'text-sky-300' : ''}>Gráficos</NavLink></li>
-            <li className='flex items-center gap-2'><Coins size={20}/><NavLink className={({isActive})=>
-            isActive ? 'text-sky-300' : ''} to='/transactions'>Transações</NavLink></li>
-            <li className='flex items-center gap-2'><PlusCircle size={20}/><NavLink  to='/newtransaction' className={({isActive})=>
-            isActive ? 'text-sky-300' : ''}>Adicionar Transação</NavLink></li>
-          </ol>
-        </aside>
-        <button onClick={handleSideBar} className='hover:cursor-pointer hover:rounded-md hover:bg-slate-100 duration-300 dark:hover:bg-slate-800'>
-            <Menu size={28}/>
-        </button>
-        <h1 className='text-2xl'>Your Finance<span className='text-green-800'>$</span></h1>
-        <button onClick={changeTheme} className='hover:cursor-pointer hover:text-yellow-500 duration-300'>
-          {theme === 'light' ? <RiMoonClearFill  className='sm:animate-slideLeft' size={25}/> : <RiSunFill  className='sm:animate-slideLeft' size={25}/>}
-        </button>
-    </header>
-    </>
-  )
-}
+      {/* Overlay para fechar a sidebar ao clicar fora */}
+      {sideBar && (
+        <div
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[60] transition-opacity"
+          onClick={handleSideBar}
+        />
+      )}
 
-export default Header
+      {/* Sidebar Reformulada */}
+      <aside
+        className={`fixed top-0 left-0 z-[70] w-72 h-screen transition-all duration-500 will-change-transform bg-white dark:bg-gray-950 border-r border-slate-200 dark:border-gray-800 shadow-2xl ${
+          sideBar
+            ? "translate-x-0 ease-[cubic-bezier(0.4,0,0.2,1)]"
+            : "-translate-x-full ease-in"
+        }`}
+      >
+        <div className="p-6 flex flex-col h-full">
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-xl font-black tracking-tighter dark:text-white">
+              Menu
+            </h2>
+            <button
+              onClick={handleSideBar}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-full transition-colors text-rose-500"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          <nav>
+            <ul className="flex flex-col gap-2">
+              {[
+                {
+                  to: "/",
+                  icon: <LayoutDashboard size={20} />,
+                  label: "Dashboard",
+                },
+                {
+                  to: "/charts",
+                  icon: <BarChart size={20} />,
+                  label: "Gráficos",
+                },
+                {
+                  to: "/transactions",
+                  icon: <Coins size={20} />,
+                  label: "Transações",
+                },
+                {
+                  to: "/newtransaction",
+                  icon: <PlusCircle size={20} />,
+                  label: "Adicionar",
+                },
+              ].map((item) => (
+                <li key={item.to}>
+                  <NavLink
+                    to={item.to}
+                    onClick={() => setSideBar(false)}
+                    className={({ isActive }) => `
+                      flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 font-medium
+                      ${
+                        isActive
+                          ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                          : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-gray-800"
+                      }
+                    `}
+                  >
+                    {item.icon}
+                    {item.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <div className="mt-auto pt-6 border-t border-slate-100 dark:border-gray-800">
+            <p className="text-xs text-center text-slate-400 uppercase tracking-widest font-bold">
+              Your Finance $
+            </p>
+          </div>
+        </div>
+      </aside>
+
+      {/* Header Estilizado */}
+      <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-slate-200 dark:border-gray-800 px-4 sm:px-8 py-4 flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleSideBar}
+            className="p-2 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-300 text-slate-600 dark:text-slate-300"
+          >
+            <Menu size={24} />
+          </button>
+        </div>
+
+        <h1 className="text-2xl font-black tracking-tighter text-slate-900 dark:text-white italic">
+          Your Finance<span className="text-emerald-500 not-italic">$</span>
+        </h1>
+
+        <button
+          onClick={changeTheme}
+          className="p-2 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-full transition-all duration-300 group"
+        >
+          {theme === "light" ? (
+            <RiMoonClearFill
+              size={22}
+              className="text-slate-600 group-hover:text-indigo-500 transition-colors"
+            />
+          ) : (
+            <RiSunFill
+              size={22}
+              className="text-yellow-400 group-hover:rotate-90 transition-transform duration-500"
+            />
+          )}
+        </button>
+      </header>
+    </>
+  );
+};
+
+export default Header;

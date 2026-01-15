@@ -1,154 +1,226 @@
-import React, { useState, useEffect } from 'react'
-import Header from '../Components/Header'
-
-import { db } from '../firebaseconfig'
-import { collection, addDoc,} from 'firebase/firestore'
+import React, { useState } from "react";
+import Header from "../Components/Header";
+import { db } from "../firebaseconfig";
+import { collection, addDoc } from "firebase/firestore";
+import { Save, ArrowRightLeft, Calendar, Tag, DollarSign } from "lucide-react";
 
 const NewTransaction = () => {
+  const [formData, setFormData] = useState({
+    type: "",
+    title: "",
+    value: "",
+    date: "",
+    expenseName: "",
+  });
 
   const formatValue = (value) => {
-  return Number(value.replace(',', '.'))
-}
+    return Number(value.replace(",", "."));
+  };
 
-  const handleSubmit = async (e) =>{
-    e.preventDefault()
-    
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const parsedValue = formatValue(formData.value)
-      const newTransaction = {...formData, 
-        value:parsedValue, 
-        createdAt: new Date()}
-      console.log(newTransaction)
-      await addDoc(collection(db, "transactions"), newTransaction)
-      alert('Lançamento realizado com sucesso')
+      const parsedValue = formatValue(formData.value);
+      const newTransaction = {
+        ...formData,
+        value: parsedValue,
+        createdAt: new Date(),
+      };
+      await addDoc(collection(db, "transactions"), newTransaction);
+      alert("Lançamento realizado com sucesso");
       setFormData({
-      type: '',
-      title: '',
-      value: '',
-      date: '',
-      expenseName: ''
-    })
-    } 
-    catch (error) {
+        type: "",
+        title: "",
+        value: "",
+        date: "",
+        expenseName: "",
+      });
+    } catch (error) {
       console.error("Erro ao salvar transação:", error);
     }
-  }
+  };
 
-const handleChange = (e) =>{
-  const {name,value} = e.target
-  setFormData(prevData =>({
-    ...prevData,
-    [name]: value
-  }))
-}
-
-  const [formData, setFormData] = useState({
-    type: '',
-    title: '',
-    value: '',
-    date: '',
-    expenseName: ''
-  })
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
 
   return (
-    <div className='bg-white dark:bg-gray-950 min-h-screen flex flex-col'>
-        <Header/>
-        <h2 className='text-center text-2xl mt-10 dark:text-white'>Adicionar transação</h2>
-        <div className='flex justify-center mt-20'>
-          <form onSubmit={handleSubmit} className=' animate-slideUp grid grid-cols-2 items-center w-96 gap-y-5 p-8 
-          shadow-slate-500 dark:shadow-slate-500 bg-gray-100 shadow-sm
-           dark:bg-gray-800 rounded-xl'>
-              <div className=' flex justify-center col-span-2 gap-2'>
-                <label htmlFor="incoming">
-                  <span className='dark:text-white'>Recebimento</span>
-                </label>
-                <input required type="radio" name="type" id="incoming" value="Recebimento" onChange={handleChange} checked={formData.type === 'Recebimento'} />
-                <label htmlFor="expenses">
-                  <span className='dark:text-white'>Despesa</span>
-                </label>
-                <input type="radio" required name="type" id="expenses" value="Despesa" onChange={handleChange} checked={formData.type === 'Despesa'} />
+    <div className="bg-slate-50 dark:bg-gray-950 min-h-screen flex flex-col transition-colors duration-300">
+      <Header />
+
+      <main className="flex-grow flex items-center justify-center py-12 px-4">
+        <div className="w-full max-w-lg bg-white dark:bg-gray-900 rounded-[2.5rem] p-8 md:p-10 shadow-xl border border-slate-200 dark:border-gray-800 animate-slideUp">
+          <div className="mb-8 text-center">
+            <h2 className="text-3xl font-black tracking-tighter dark:text-white italic">
+              Nova Transação
+              <span className="text-emerald-500 not-italic">.</span>
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
+              Cadastre seus fluxos financeiros com precisão
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Seletor de Tipo Premium */}
+            <div className="flex p-1 bg-slate-100 dark:bg-gray-800 rounded-2xl gap-1">
+              <label
+                className={`flex-1 flex justify-center items-center gap-2 py-3 rounded-xl cursor-pointer transition-all duration-300 ${
+                  formData.type === "Recebimento"
+                    ? "bg-white dark:bg-gray-700 shadow-sm text-emerald-600 dark:text-emerald-400 font-bold"
+                    : "text-slate-500"
+                }`}
+              >
+                <input
+                  required
+                  type="radio"
+                  name="type"
+                  value="Recebimento"
+                  onChange={handleChange}
+                  checked={formData.type === "Recebimento"}
+                  className="hidden"
+                />
+                <span>Recebimento</span>
+              </label>
+              <label
+                className={`flex-1 flex justify-center items-center gap-2 py-3 rounded-xl cursor-pointer transition-all duration-300 ${
+                  formData.type === "Despesa"
+                    ? "bg-white dark:bg-gray-700 shadow-sm text-rose-600 dark:text-rose-400 font-bold"
+                    : "text-slate-500"
+                }`}
+              >
+                <input
+                  type="radio"
+                  required
+                  name="type"
+                  value="Despesa"
+                  onChange={handleChange}
+                  checked={formData.type === "Despesa"}
+                  className="hidden"
+                />
+                <span>Despesa</span>
+              </label>
+            </div>
+
+            {formData.type && (
+              <div className="space-y-5 animate-fadeIn">
+                {/* Título ou Categoria */}
+                <div className="relative">
+                  <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase ml-2 mb-1 block tracking-widest">
+                    {formData.type === "Recebimento" ? "Título" : "Categoria"}
+                  </label>
+                  <div className="flex items-center">
+                    <div className="absolute left-4 text-slate-400">
+                      <Tag size={18} />
+                    </div>
+                    {formData.type === "Recebimento" ? (
+                      <input
+                        className="w-full pl-11 pr-4 py-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none dark:text-white transition-all"
+                        type="text"
+                        name="title"
+                        required
+                        placeholder="Ex: Salário Mensal"
+                        onChange={handleChange}
+                        value={formData.title}
+                      />
+                    ) : (
+                      <select
+                        name="title"
+                        required
+                        onChange={handleChange}
+                        value={formData.title}
+                        className="w-full pl-11 pr-4 py-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none dark:text-white appearance-none cursor-pointer transition-all"
+                      >
+                        <option value="">Selecione uma categoria</option>
+                        <option value="Contas residenciais">
+                          Residência (luz, água)
+                        </option>
+                        <option value="Condução">Condução</option>
+                        <option value="Alimentação">Alimentação</option>
+                        <option value="Educação">Educação</option>
+                        <option value="Saúde">Saúde</option>
+                        <option value="Outros">Outros</option>
+                      </select>
+                    )}
+                  </div>
+                </div>
+
+                {/* Campo dinâmico para "Outros" */}
+                {formData.title === "Outros" && formData.type === "Despesa" && (
+                  <div className="animate-slideDown">
+                    <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase ml-2 mb-1 block tracking-widest">
+                      Qual a despesa?
+                    </label>
+                    <input
+                      required
+                      className="w-full px-5 py-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none dark:text-white transition-all"
+                      type="text"
+                      name="expenseName"
+                      placeholder="Nome da despesa"
+                      onChange={handleChange}
+                      value={formData.expenseName}
+                    />
+                  </div>
+                )}
+
+                {/* Valor e Data */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="relative">
+                    <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase ml-2 mb-1 block tracking-widest">
+                      Valor
+                    </label>
+                    <div className="absolute left-4 top-[2.45rem] text-slate-400">
+                      <DollarSign size={18} />
+                    </div>
+                    <input
+                      className="w-full pl-11 pr-4 py-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none dark:text-white font-bold transition-all"
+                      type="number"
+                      step="0.01"
+                      required
+                      name="value"
+                      placeholder="0,00"
+                      onChange={handleChange}
+                      value={formData.value}
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <label className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase ml-2 mb-1 block tracking-widest">
+                      Data
+                    </label>
+                    <div className="absolute left-4 top-[2.45rem] text-slate-400">
+                      <Calendar size={18} />
+                    </div>
+                    <input
+                      className="w-full pl-11 pr-4 py-4 bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none dark:text-white transition-all"
+                      type="date"
+                      name="date"
+                      required
+                      onChange={handleChange}
+                      value={formData.date}
+                    />
+                  </div>
+                </div>
+
+                {/* Botão de Submit */}
+                <button
+                  type="submit"
+                  className={`w-full py-4 rounded-2xl text-white font-black uppercase tracking-widest shadow-lg transition-all duration-300 flex items-center justify-center gap-3 mt-4 ${
+                    formData.type === "Recebimento"
+                      ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20"
+                      : "bg-rose-500 hover:bg-rose-600 shadow-rose-500/20"
+                  }`}
+                >
+                  <Save size={20} />
+                  Confirmar Lançamento
+                </button>
               </div>
-
-              {formData.type === 'Recebimento' && (
-                <>
-                  <label htmlFor="title">
-                    <span className='dark:text-white'>Título</span>
-                  </label>
-                  <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
-                    dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
-                    type="text" name="title" id="title" required onChange={handleChange} value={formData.title} />
-
-                  <label htmlFor="value">
-                    <span className='dark:text-white'>Valor da transação</span>
-                  </label>
-                  <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
-                    dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
-                    type="number" name="value" id="value" required onChange={handleChange} value={formData.value} />
-
-                  <label htmlFor="date">
-                    <span className='dark:text-white'>Data</span>
-                  </label>
-                  <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
-                    dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
-                    type="date" name="date" id="date" required onChange={handleChange} value={formData.date} />
-                </>
-              )}
-              {formData.type === 'Despesa' && (
-                <>
-                  <label htmlFor="category">
-                    <span className='dark:text-white'>Categoria</span>
-                  </label>
-                  <select value={formData.title} required onChange={handleChange} className='dark:text-white bg-gray-100 
-                  dark:bg-gray-800 focus:outline-none 
-                    text-center' name="title" id="category">
-                    <option value="">Categoria</option>
-                    <option value="Contas residenciais">Residência (luz,água)</option>
-                    <option value="Condução">Condução</option>
-                    <option value="Alimentação">Alimentação</option>
-                    <option value="Educação">Educação</option>
-                    <option value="Saúde">Saúde</option>
-                    <option value="Outros">Outros</option>
-                  </select>
-                  {formData.title === 'Outros' &&(
-                  <>
-                  <label htmlFor="">
-                    <span className='dark:text-white'>Nome de sua despesa</span>
-                  </label>
-                  <input required className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
-                    dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
-                    type="text" name="expenseName" id="expense-name" onChange={handleChange} value={formData.expenseName} />
-                  </>
-                
-                  )}
-                  <label htmlFor="value">
-                    <span className='dark:text-white'>Valor da transação</span>
-                  </label>
-                  <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
-                    dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
-                    type="number" step='0.01' required name="value" id="value" onChange={handleChange} value={formData.value} />
-
-                  <label htmlFor="date">
-                    <span className='dark:text-white'>Data</span>
-                  </label>
-                  <input className='border-slate-300 border-1 dark:text-white dark:border-1 text-center 
-                    dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0'
-                    type="date" name="date" required id="date" onChange={handleChange} value={formData.date} />
-                </>
-              )}
-              <div className='flex justify-center col-span-2 mt-5'>
-                <input className='text-white bg-green-700 rounded-lg p-5 text-md hover:bg-green-500 cursor-pointer duration-300' type="submit" value="Confirmar" />
-              </div>
-              
-          </form>  
+            )}
+          </form>
         </div>
+      </main>
     </div>
-  )
-}
+  );
+};
 
-export default NewTransaction
+export default NewTransaction;

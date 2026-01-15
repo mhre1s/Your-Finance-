@@ -1,350 +1,419 @@
-import React, { useState, useEffect } from 'react'
-import useTransactions from '../Hooks/useTransactions'
-import Header from '../Components/Header'
-import blackPencil from '../assets/icons-black.svg'
-import lixeira from '../assets/lixeira.svg'
-import ConfirmButton from '../Components/ConfirmButton'
-import { XMarkIcon } from "@heroicons/react/24/solid";
-import { FunnelIcon } from "@heroicons/react/24/outline";
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid'
+import React, { useState } from "react";
+import useTransactions from "../Hooks/useTransactions";
+import Header from "../Components/Header";
+import {
+  Pencil,
+  Trash2,
+  Search,
+  Filter,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpCircle,
+  ArrowDownCircle,
+  Calendar as CalendarIcon,
+} from "lucide-react";
 
 const Transactions = () => {
-  const [deleteModal, setDeleteModal] = useState(false)
-  const [updateModal, setUpdateModal] = useState(false)
-  const [getId, setGetId] = useState(null)
-  const { transactionsList,deleteTransaction, updateTransaction, fetchTransactions, loading} = useTransactions()
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [updateModal, setUpdateModal] = useState(false);
+  const [getId, setGetId] = useState(null);
+  const {
+    transactionsList,
+    deleteTransaction,
+    updateTransaction,
+    fetchTransactions,
+    loading,
+  } = useTransactions();
 
-  const [editTitle, setEditTitle] = useState('')
-  const [editValue, setEditValue] = useState('')
-  const [editDate, setEditDate] = useState('')
-  const [editType, setEditType] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [search, setSearch] = useState('')
-
+  const [editTitle, setEditTitle] = useState("");
+  const [editValue, setEditValue] = useState("");
+  const [editDate, setEditDate] = useState("");
+  const [editType, setEditType] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState("");
   const [filterDate, setFilterDate] = useState("");
   const [filterType, setFilterType] = useState("");
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
 
-  const filteredTitle = transactionsList.filter(transaction =>{
+  const transactionsPerPage = 10;
+
+  const filteredTransactions = transactionsList.filter((transaction) => {
     const matchesTitle = transaction.title
       .toLowerCase()
       .includes(search.toLowerCase());
     const matchesType = filterType ? transaction.type === filterType : true;
-    const matchesDate =
-      filterDate && !isNaN(new Date(filterDate).getTime())
-     ? transaction.date === filterDate
-     : true;
-    console.log(matchesDate);
-    return matchesTitle && matchesDate && matchesType
-    }
-  )
-  
+    const matchesDate = filterDate ? transaction.date === filterDate : true;
+    return matchesTitle && matchesDate && matchesType;
+  });
 
-  const [filter, setFilter] = useState(false)
-  const transactionsPerPage = 8
-  const initialIndex = (currentPage - 1) * transactionsPerPage  
-  const finalIndex = currentPage * transactionsPerPage
+  const totalPages = Math.ceil(
+    filteredTransactions.length / transactionsPerPage
+  );
+  const paginatedTransactions = filteredTransactions.slice(
+    (currentPage - 1) * transactionsPerPage,
+    currentPage * transactionsPerPage
+  );
 
-  
   const confirmUpdate = async () => {
-  if(getId){
-    try {
+    if (getId) {
       await updateTransaction(getId, {
         title: editTitle,
         value: Number(editValue),
         date: editDate,
-        type: editType
-      })
-      await fetchTransactions()
-      setUpdateModal(false)
-      setGetId(null)
-    } catch (error) {
-      console.error("Erro ao atualizar transação:", error)
+        type: editType,
+      });
+      await fetchTransactions();
+      setUpdateModal(false);
+      setGetId(null);
     }
-  }
-}
+  };
 
-  const handleDeleteClick = (id) =>{
-    setDeleteModal(true)
-    setGetId(id)
-  }
+  const handleUpdateClick = (t) => {
+    setEditTitle(t.title);
+    setEditValue(t.value);
+    setEditDate(t.date);
+    setEditType(t.type);
+    setGetId(t.id);
+    setUpdateModal(true);
+  };
 
-  const handleUpdateClick = (transaction) => {
-  setEditTitle(transaction.title);
-  setEditValue(transaction.value);
-  setEditDate(transaction.date);
-  setEditType(transaction.type);
-  setGetId(transaction.id);
-  setUpdateModal(true);
-  }
-
-  const confirmDelete = () =>{
-    if(getId){
-      deleteTransaction(getId)
-      setDeleteModal(false)
-      setGetId(null)
+  const confirmDelete = async () => {
+    if (getId) {
+      await deleteTransaction(getId);
+      setDeleteModal(false);
+      setGetId(null);
     }
-  }
+  };
+
   return (
-    <div className="dark:bg-gray-950 min-h-screen bg-white flex flex-col dark:text-white">
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
       <Header />
-      <h1 className="text-center text-2xl mt-10">Histórico de transações</h1>
-      <div className="flex flex-col justify-center gap-5 items-center">
-        <div className="flex flex-col justify-center items-start mt-10 gap-5">
-          {deleteModal && (
-            <>
-              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
-              <div className="fixed z-50 inset-0 flex items-center justify-center animate-center">
-                <div
-                  className=" flex flex-col justify-evenly fixed backdrop-blur-sm
-              dark:bg-gray-900 bg-white dark:text-white z-50 border-slate-300
-              dark:border-slate-800 border-2 p-6 rounded-xl max-w-lg gap-10"
-                >
-                  <h2 className="text-xl">
-                    Realmente deseja remover esta transação?
-                  </h2>
-                  <div className="flex justify-around">
-                    <ConfirmButton onClick={confirmDelete}>
-                      Confirmar
-                    </ConfirmButton>
-                    <ConfirmButton
-                      onClick={() => setDeleteModal(false)}
-                      className=" bg-red-500 dark:bg-red-700"
-                    >
-                      Cancelar
-                    </ConfirmButton>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-          {updateModal && (
-            <>
-              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
-              <div className="fixed z-50 inset-0 flex items-center justify-center animate-center">
-                <div
-                  className=" flex flex-col justify-evenly fixed backdrop-blur-sm
-              dark:bg-gray-900 bg-white dark:text-white z-50 border-slate-300
-              dark:border-slate-800 border-2 p-6 rounded-xl max-w-lg gap-10"
-                >
-                  <input
-                    type="text"
-                    placeholder="Título"
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    className="border-slate-300 border-1 dark:text-white dark:border-1 text-center 
-                    dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Valor"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    className="border-slate-300 border-1 dark:text-white dark:border-1 text-center 
-                    dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
-                  />
-                  <input
-                    type="date"
-                    placeholder="Data"
-                    value={editDate}
-                    onChange={(e) => setEditDate(e.target.value)}
-                    className="border-slate-300 border-1 dark:text-white dark:border-1 text-center 
-                    dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
-                  />
-                  <select
-                    value={editType}
-                    onChange={(e) => setEditType(e.target.value)}
-                    className="dark:text-white
-                  dark:bg-gray-900 focus:outline-none 
-                    text-center"
-                  >
-                    <option value="Recebimento">Recebimento</option>
-                    <option value="Despesa">Despesa</option>
-                  </select>
-                  <div className="flex justify-around">
-                    <ConfirmButton onClick={confirmUpdate}>
-                      Confirmar
-                    </ConfirmButton>
-                    <ConfirmButton
-                      onClick={() => setUpdateModal(false)}
-                      className=" bg-red-500 dark:bg-red-700"
-                    >
-                      Cancelar
-                    </ConfirmButton>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-          {!loading && (
-            <div className="flex gap-5 justify-between w-full">
+
+      <main className="max-w-6xl mx-auto px-4 py-10">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+          <div>
+            <h1 className="text-3xl font-black tracking-tighter italic">
+              Histórico de{" "}
+              <span className="text-emerald-500 not-italic">Transações</span>
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">
+              Gerencie e filtre seus movimentos financeiros.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="relative group">
+              <Search
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors"
+                size={18}
+              />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                name="search"
-                id="search"
-                placeholder="Busca por título"
-                className="md:w-68 w-48 border-slate-300 border-1 dark:text-white dark:border-1
-                    dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
+                placeholder="Buscar por título..."
+                className="pl-10 pr-4 py-2.5 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all w-full md:w-64"
               />
-              <FunnelIcon
-                onClick={() => setFilter((prev) => !prev)}
-                className="w-6 h-6 cursor-pointer"
-              />
-              {filter && (
-                <div
-                  className="fixed top-60 right-12 sm:right-42 bg-white border-slate-200 dark:border-slate-700 dark:bg-gray-900 
-                                border p-4 rounded shadow-lg z-50 flex flex-col gap-3"
-                >
-                  <div className="flex justify-end">
-                    <button
-                      className=" flex items-center justify-center border-1
-                    border-solid border-red-500 bg-red-500 w-5 h-5 rounded-full
-                    cursor-pointer"
-                    onClick={() => setFilter((prev) => !prev)}>
-                      <XMarkIcon className=" text-white text-end" />
-                    </button>{" "}
-                  </div>
+            </div>
 
+            <button
+              onClick={() => setShowFilterMenu(!showFilterMenu)}
+              className={`p-2.5 rounded-xl border transition-all ${
+                showFilterMenu
+                  ? "bg-emerald-500 border-emerald-500 text-white"
+                  : "bg-white dark:bg-gray-900 border-slate-200 dark:border-gray-800 text-slate-500 hover:border-emerald-500"
+              }`}
+            >
+              <Filter size={20} />
+            </button>
+          </div>
+        </header>
+
+        {/* Menu de Filtros Expansível */}
+        {showFilterMenu && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 p-6 bg-white dark:bg-gray-900 rounded-2xl border border-slate-200 dark:border-gray-800 animate-fadeIn">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Data
+              </label>
+              <input
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-gray-800 p-2 rounded-lg outline-none"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Tipo
+              </label>
+              <select
+                value={filterType}
+                onChange={(e) => setFilterType(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-gray-800 p-2 rounded-lg outline-none cursor-pointer"
+              >
+                <option value="">Todos</option>
+                <option value="Recebimento">Recebimento</option>
+                <option value="Despesa">Despesa</option>
+              </select>
+            </div>
+            <div className="flex items-end">
+              <button
+                onClick={() => {
+                  setFilterDate("");
+                  setFilterType("");
+                }}
+                className="text-xs text-rose-500 font-bold hover:underline py-2"
+              >
+                Limpar Filtros
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Tabela Premium */}
+        <div className="bg-white dark:bg-gray-900 rounded-[2rem] shadow-xl border border-slate-200 dark:border-gray-800 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50 dark:bg-gray-800/50 border-b border-slate-100 dark:border-gray-800">
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">
+                    Título
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">
+                    Data
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-right">
+                    Valor
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-widest text-slate-400 text-center">
+                    Ações
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-gray-800">
+                {loading
+                  ? Array.from({ length: 5 }).map((_, i) => (
+                      <tr key={i} className="animate-pulse">
+                        <td colSpan="5" className="px-6 py-6">
+                          <div className="h-4 bg-slate-100 dark:bg-gray-800 rounded w-full"></div>
+                        </td>
+                      </tr>
+                    ))
+                  : paginatedTransactions.map((t) => (
+                      <tr
+                        key={t.id}
+                        className="hover:bg-slate-50 dark:hover:bg-gray-800/40 transition-colors group"
+                      >
+                        <td className="px-6 py-4">
+                          {t.type === "Recebimento" ? (
+                            <ArrowUpCircle
+                              className="text-emerald-500"
+                              size={20}
+                            />
+                          ) : (
+                            <ArrowDownCircle
+                              className="text-rose-500"
+                              size={20}
+                            />
+                          )}
+                        </td>
+                        <td className="px-6 py-4 font-semibold text-sm">
+                          {t.title}
+                        </td>
+                        <td className="px-6 py-4 text-slate-500 text-sm">
+                          {t.date.split("-").reverse().join("/")}
+                        </td>
+                        <td
+                          className={`px-6 py-4 text-right font-bold text-sm ${
+                            t.type === "Recebimento"
+                              ? "text-emerald-600"
+                              : "text-rose-500"
+                          }`}
+                        >
+                          {t.type === "Recebimento" ? "+ " : "- "}
+                          {new Intl.NumberFormat("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          }).format(t.value)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex justify-center gap-2">
+                            <button
+                              onClick={() => handleUpdateClick(t)}
+                              className="p-2 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-slate-400 hover:text-emerald-500 rounded-lg transition-all"
+                            >
+                              <Pencil size={16} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setGetId(t.id);
+                                setDeleteModal(true);
+                              }}
+                              className="p-2 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 rounded-lg transition-all"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Paginação Premium */}
+        {!loading && totalPages > 1 && (
+          <div className="flex justify-center items-center gap-4 mt-8">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              className="p-2 rounded-xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 disabled:opacity-30 hover:border-emerald-500 transition-all"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <span className="text-sm font-bold text-slate-500">
+              Página {currentPage} de {totalPages}
+            </span>
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="p-2 rounded-xl bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 disabled:opacity-30 hover:border-emerald-500 transition-all"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        )}
+      </main>
+
+      {deleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+            onClick={() => setDeleteModal(false)}
+          />
+          <div className="relative bg-white dark:bg-gray-900 w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl border border-slate-200 dark:border-gray-800 animate-zoomIn">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-rose-100 dark:bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mb-6">
+                <Trash2 size={32} />
+              </div>
+              <h2 className="text-2xl font-black tracking-tighter italic mb-2 dark:text-white">
+                Excluir Transação
+                <span className="text-rose-500 not-italic">?</span>
+              </h2>
+              <p className="text-slate-500 dark:text-slate-400 mb-8">
+                Esta ação não pode ser desfeita. O registro será removido
+                permanentemente do seu histórico.
+              </p>
+              <div className="flex w-full gap-3">
+                <button
+                  onClick={() => setDeleteModal(false)}
+                  className="flex-1 py-4 bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-slate-300 font-bold rounded-2xl hover:bg-slate-200 dark:hover:bg-gray-700 transition-all"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 py-4 bg-rose-500 text-white font-bold rounded-2xl shadow-lg shadow-rose-500/30 hover:bg-rose-600 transition-all"
+                >
+                  Excluir
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE EDIÇÃO */}
+      {updateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+          <div
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+            onClick={() => setUpdateModal(false)}
+          />
+          <div className="relative bg-white dark:bg-gray-900 w-full max-w-lg rounded-[2.5rem] p-8 shadow-2xl border border-slate-200 dark:border-gray-800 animate-zoomIn">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-black tracking-tighter italic dark:text-white">
+                Editar Transação
+                <span className="text-emerald-500 not-italic">.</span>
+              </h2>
+              <button
+                onClick={() => setUpdateModal(false)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-white"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="space-y-5">
+              <div className="space-y-1 text-left">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">
+                  Título
+                </label>
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-emerald-500/20 outline-none dark:text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1 text-left">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">
+                    Valor
+                  </label>
                   <input
-                    className="border-slate-300 border-1 dark:text-white dark:border-1 text-center 
-                    dark:border-slate-700 rounded-lg p-1.5 
-                      [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none focus:outline-0"
-                    type="date"
-                    name="date"
-                    id="date"
-                    value={filterDate}
-                    onChange={(e) => setFilterDate(e.target.value)}
-                    required
+                    type="number"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-emerald-500/20 outline-none dark:text-white font-bold"
                   />
-                  {editDate && (
-                    <button
-                      onClick={() => setEditDate("")}
-                      className="text-sm px-2 py-1 bg-gray-300 dark:bg-gray-700 rounded"
-                    >
-                      Limpar data
-                    </button>
-                  )}
+                </div>
+                <div className="space-y-1 text-left">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">
+                    Tipo
+                  </label>
                   <select
-                    value={filterType}
-                    onChange={(e) => setFilterType(e.target.value)}
-                    className="border p-1 rounded dark:border-slate-700 dark:text-white border-slate-200 dark:bg-gray-900 
-                   focus:outline-none"
+                    value={editType}
+                    onChange={(e) => setEditType(e.target.value)}
+                    className="w-full bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-emerald-500/20 outline-none dark:text-white appearance-none"
                   >
-                    <option value="">Todos os tipos</option>
                     <option value="Recebimento">Recebimento</option>
                     <option value="Despesa">Despesa</option>
                   </select>
                 </div>
-              )}
-            </div>
-          )}
-          {loading && (
-            <ul className="w-full grid md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-4 gap-5">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <li
-                  key={i}
-                  className="animate-pulse bg-gray-200 dark:bg-gray-700 h-68 w-68 rounded-lg"
-                />
-              ))}
-            </ul>
-          )}
-          <ul className="w-full grid md:grid-cols-2 xl:grid-cols-4 xl:grid-rows-2 2xl:grid-cols-4 gap-5 justify-center">
-            {filteredTitle
-              .slice(initialIndex, finalIndex)
-              .map((transaction, index) => (
-                <li
-                  className="opacity-0 dark:bg-gray-800 bg-gray-100 shadow-slate-500 dark:border-slate-700 border-1 
-              border-solid border-slate-200 dark:shadow-slate-700 shadow-sm p-4 flex flex-col items-center 
-              justify-center gap-5 h-68 w-68 rounded-lg animate-slideLeft duration-300 hover:scale-105 hover:brightness-110 dark:hover:brightness-125"
-                  style={{ animationDelay: `${index * 200}ms` }}
-                  key={transaction.id}
-                >
-                  <div className="flex justify-around w-full">
-                    <button className=" bg-gray-300 dark:bg-slate-700 p-1 rounded-lg cursor-pointer">
-                      <img
-                        src={blackPencil}
-                        alt="editar"
-                        className="w-6 h-6 text-white dark:invert"
-                        onClick={() => handleUpdateClick(transaction)}
-                      />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(transaction.id)}
-                      className=" bg-red-500 dark:bg-red-700 rounded-lg w-8 cursor-pointer"
-                    >
-                      <img
-                        className="dark:invert pl-1"
-                        src={lixeira}
-                        alt="excluir"
-                      />
-                    </button>
-                  </div>
-                  <span>Tipo: {transaction.type}</span>
-                  <span>
-                    Data: {transaction.date.split("-").reverse().join("/")}
-                  </span>
-                  <span>Título: {transaction.title}</span>
-                  <span
-                    className={`${
-                      transaction.type === "Recebimento"
-                        ? "text-green-600"
-                        : "text-red-500"
-                    }`}
-                  >
-                    Valor: {Number(transaction.value).toFixed(2)}
-                  </span>
-                </li>
-              ))}
-          </ul>
-        </div>
+              </div>
 
-        {!loading && (
-          <div
-            className={`mb-15 ${
-              filteredTitle.length === 0 ? `hidden` : `block`
-            }`}
-          >
-            <button
-              className={`transition-opacity duration-500 ${
-                currentPage === 1 ? "opacity-50" : "opacity-100"
-              }`}
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(currentPage - 1)}
-            >
-              <ChevronLeftIcon className="h-5 w-5" />
-            </button>
-            <button
-              className={` transition-opacity duration-500 ${
-                currentPage ===
-                Math.ceil(filteredTitle.length / transactionsPerPage)
-                  ? "opacity-50"
-                  : "opacity-100"
-              }`}
-              disabled={
-                currentPage ===
-                Math.ceil(filteredTitle.length / transactionsPerPage)
-              }
-              onClick={() =>
-                setCurrentPage((prev) =>
-                  Math.min(
-                    prev + 1,
-                    Math.ceil(filteredTitle.length / transactionsPerPage)
-                  )
-                )
-              }
-            >
-              <ChevronRightIcon className="h-5 w-5" />
-            </button>
+              <div className="space-y-1 text-left">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">
+                  Data
+                </label>
+                <input
+                  type="date"
+                  value={editDate}
+                  onChange={(e) => setEditDate(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-emerald-500/20 outline-none dark:text-white"
+                />
+              </div>
+
+              <button
+                onClick={confirmUpdate}
+                className="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-emerald-500/20 hover:bg-emerald-600 transition-all mt-4"
+              >
+                Salvar Alterações
+              </button>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
-}
+};
 
-export default Transactions
+export default Transactions;
