@@ -10,8 +10,8 @@ O objetivo é facilitar o acompanhamento de entradas e saídas, trazendo mais cl
 🔗 [Acesse aqui o projeto online](https://yourfinancess.netlify.app/)
 
 <p align="center">
-  <img src="./prints/trsList.png" alt="Preview do Projeto" width="800"/>
-  <img src="./prints/chart.png" alt="Preview do Projeto" width="800"/>
+  <img src="./prints/trsList1.png" alt="Preview do Projeto" width="800"/>
+  <img src="./prints/chart1.png" alt="Preview do Projeto" width="800"/>
 </p>
 
 ---
