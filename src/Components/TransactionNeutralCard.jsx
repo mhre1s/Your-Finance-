@@ -18,7 +18,7 @@ const TransactionNeutralCard = ({ amount }) => {
         }`}
       ></div>
 
-      <div className="relative bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl p-6 shadow-xl w-72 h-40 md:w-80 md:h-44 flex flex-col justify-between overflow-hidden">
+      <div className="relative bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-800 rounded-2xl p-6 shadow-xl w-64 h-40 flex flex-col justify-between overflow-hidden">
         {/* Ícone de fundo sutil para dar textura */}
         <Wallet
           className={`absolute -right-4 -bottom-4 opacity-5 dark:opacity-10 rotate-12 ${

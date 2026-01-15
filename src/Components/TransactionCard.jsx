@@ -8,11 +8,11 @@ const TransactionCard = ({ receipts }) => {
   }).format(receipts);
 
   return (
-    <div className="relative group transition-all duration-300 hover:-translate-y-1">
+    <div className="w-64 relative group transition-all duration-300 hover:-translate-y-1">
       {/* Glow effect de fundo (aparece mais no dark mode) */}
       <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
 
-      <div className="relative bg-white dark:bg-gray-900 border border-slate-200 dark:border-emerald-500/20 rounded-2xl p-6 shadow-sm w-72 h-40 flex flex-col justify-between overflow-hidden">
+      <div className="relative bg-white dark:bg-gray-900 border border-slate-200 dark:border-emerald-500/20 rounded-2xl p-6 shadow-sm w-64 h-40 flex flex-col justify-between overflow-hidden">
         {/* Detalhe decorativo sutil no fundo */}
         <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl"></div>
 

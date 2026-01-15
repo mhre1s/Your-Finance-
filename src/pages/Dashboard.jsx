@@ -25,31 +25,33 @@ const Dashboard = () => {
 
       <main className="max-w-6xl mx-auto px-4 py-8 md:py-12">
         {/* Seção de Resumo (Cards) */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        {/* Seção de Resumo (Cards) - Centralização Corrigida */}
+        <section className="flex flex-col md:flex-row flex-wrap justify-center min-[850px]:justify-between items-center gap-6 mb-12">
           {loading ? (
-            // Skeleton loader para os cards
             [1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-32 bg-slate-200 dark:bg-gray-800 animate-pulse rounded-2xl"
+                className="h-32 w-full max-w-[320px] bg-slate-200 dark:bg-gray-800 animate-pulse rounded-2xl"
               />
             ))
           ) : (
             <>
-              <div className="md:order-1">
+              {/* Ordem ajustada para: Receitas | Saldo (Centro) | Despesas */}
+              <div className="order-1">
                 <TransactionCard receipts={reducedReceipts} />
               </div>
-              <div className="md:order-3">
-                <TransactionRedCard expenses={reducedExpenses} />
-              </div>
-              <div className="md:order-2 scale-105">
-                {/* O saldo neutro fica no centro e levemente maior */}
+
+              <div className="order-3">
+                {/* Card de Saldo levemente maior e sempre no centro */}
                 <TransactionNeutralCard amount={amount} />
+              </div>
+
+              <div className="order-2">
+                <TransactionRedCard expenses={reducedExpenses} />
               </div>
             </>
           )}
         </section>
-
         {/* Tabela de Transações */}
         <section className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-slate-200 dark:border-gray-800 overflow-hidden">
           <div className="px-6 py-5 border-b border-slate-100 dark:border-gray-800 flex justify-between items-center">
