@@ -60,16 +60,21 @@ const Charts = () => {
         <div className="flex flex-wrap items-center gap-4 mb-10 p-4 bg-white dark:bg-gray-900/50 rounded-[2rem] border border-slate-200 dark:border-gray-800 w-fit mx-auto md:mx-0">
           <div className="flex items-center gap-3 px-4">
             <Calendar size={18} className="text-sky-500" />
+            <label htmlFor="start">Início:</label>
             <input
+              id="start"
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               className="bg-transparent outline-none text-sm font-medium dark:text-white"
             />
           </div>
-          <ArrowRight size={16} className="text-slate-300" />
+          <ArrowRight size={16} className="hidden lg:block text-slate-300" />
           <div className="flex items-center gap-3 px-4">
+            <Calendar size={18} className="text-sky-500" />
+            <label htmlFor="end">Fim:</label>
             <input
+              id="end"
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
