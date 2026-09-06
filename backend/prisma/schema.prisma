@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. Enum para garantir integridade do tipo de transação
+enum TransactionType {
+  RECEBIMENTO
+  DESPESA
+}
+
+// 2. Modelo de Usuários com hash bcrypt
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  password     String        // Hash gerado pelo bcrypt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // Relacionamento 1:N (Um usuário tem muitas transações)
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+// 3. Modelo de Transações vinculado ao Usuário
+model Transaction {
+  id          String          @id @default(uuid())
+  type        TransactionType
+  title       String          
+  expenseName String?         
+  value       Decimal         @db.Decimal(10, 2) 
+  date        DateTime        @db.Date
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Chave estrangeira e relação com User
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
