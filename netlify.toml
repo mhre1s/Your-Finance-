@@ -1,0 +1,18 @@
+# Configuração do Netlify para Repositório Monorepo
+
+[build]
+  # Pasta onde está o frontend
+  base = "Your-Finance-"
+  
+  # Comando para instalar dependências e compilar
+  command = "npm run build"
+  
+  # Pasta onde o Vite gera o bundle final (relativo à pasta base)
+  publish = "dist"
+
+# Regra para suportar SPA (Single Page Application com React Router)
+# Impede erro 404 ao recarregar a página em rotas como /login ou /transactions
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
