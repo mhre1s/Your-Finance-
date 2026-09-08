@@ -33,62 +33,76 @@ const BarChartComp = ({ startDate, endDate }) => {
     if (!monthData) {
       monthData = {
         month,
-        Recebimento: 0,
+        Receita: 0,
         Despesa: 0,
         _date: new Date(trans.date),
       };
       acc.push(monthData);
     }
 
-    if (trans.type === "Recebimento") {
-      monthData.Recebimento += trans.value;
+    const isReceipt =
+      trans.type === "Recebimento" ||
+      trans.type === "RECEBIMENTO" ||
+      trans.type === "receita";
+
+    if (isReceipt) {
+      monthData.Receita += trans.value;
     } else {
       monthData.Despesa += trans.value;
     }
     return acc;
   }, []);
 
-  // 3. Ordenação
   data.sort((a, b) => a._date - b._date);
 
+  const formatCurrency = (val) =>
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(val);
+
   return (
-    /* height="100%" para respeitar os 350px que definimos no componente pai */
     <ResponsiveContainer width="100%" height="100%">
       <BarChart
         data={data}
-        margin={{ top: 10, right: 10, left: 15, bottom: 0 }}
+        margin={{ top: 10, right: 10, left: 10, bottom: 0 }}
       >
-        {/* Grade apenas horizontal e bem sutil */}
         <CartesianGrid
           strokeDasharray="3 3"
           vertical={false}
-          stroke="#e2e8f0"
-          opacity={0.5}
+          stroke="#71717a"
+          opacity={0.15}
         />
 
         <XAxis
           dataKey="month"
           axisLine={false}
           tickLine={false}
-          tick={{ fill: "#94a3b8", fontSize: 12, fontWeight: 500 }}
-          dy={10} // Afasta o texto do eixo
+          tick={{ fill: "#71717a", fontSize: 12 }}
+          dy={10}
         />
 
         <YAxis
           axisLine={false}
           tickLine={false}
-          tick={{ fill: "#94a3b8", fontSize: 10 }}
-          width={40}
+          tick={{ fill: "#71717a", fontSize: 11 }}
+          tickFormatter={(val) =>
+            val >= 1000 ? `R$ ${(val / 1000).toFixed(0)}k` : `R$ ${val}`
+          }
+          width={65}
         />
 
         <Tooltip
-          cursor={{ fill: "#f1f5f9", opacity: 0.4 }}
+          formatter={(value, name) => [formatCurrency(Number(value)), name]}
+          cursor={{ fill: "rgba(113, 113, 122, 0.08)" }}
           contentStyle={{
-            borderRadius: "16px",
-            border: "none",
+            borderRadius: "12px",
+            border: "1px solid rgba(113, 113, 122, 0.2)",
             boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
-            backgroundColor: "#fff",
-            padding: "12px",
+            backgroundColor: "rgba(24, 24, 27, 0.95)",
+            color: "#f4f4f5",
+            fontSize: "12px",
+            padding: "8px 12px",
           }}
         />
 
@@ -96,25 +110,25 @@ const BarChartComp = ({ startDate, endDate }) => {
           verticalAlign="top"
           align="right"
           iconType="circle"
+          iconSize={8}
           wrapperStyle={{
-            paddingBottom: "20px",
+            paddingBottom: "16px",
             fontSize: "12px",
-            fontWeight: "bold",
+            fontWeight: "500",
           }}
         />
 
-        {/* Barras Arredondadas (radius) e Cores Premium */}
         <Bar
-          dataKey="Recebimento"
-          fill="#10b981" // Emerald 500
+          dataKey="Receita"
+          fill="#10b981"
           radius={[4, 4, 0, 0]}
-          barSize={12}
+          barSize={14}
         />
         <Bar
           dataKey="Despesa"
-          fill="#f43f5e" // Rose 500
+          fill="#f43f5e"
           radius={[4, 4, 0, 0]}
-          barSize={12}
+          barSize={14}
         />
       </BarChart>
     </ResponsiveContainer>

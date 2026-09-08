@@ -1,79 +1,106 @@
+import { useState, useEffect, useCallback } from 'react';
+import { transactionService } from '../services/api';
 
-import { useState, useEffect } from "react"
-import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore'
-import { db } from '../firebaseconfig'
+/**
+ * Normaliza a transação retornada pelo PostgreSQL/NestJS para a interface do frontend:
+ * - Converte Decimal do Prisma para Number
+ * - Formata a data para 'YYYY-MM-DD'
+ * - Converte o enum 'RECEBIMENTO' | 'DESPESA' para 'Recebimento' | 'Despesa'
+ */
+const normalizeTransaction = (item) => {
+  const isReceipt = item.type === 'RECEBIMENTO' || item.type === 'Recebimento';
+  const rawDate = typeof item.date === 'string'
+    ? item.date.split('T')[0]
+    : new Date(item.date).toISOString().split('T')[0];
 
-const useTransactions = () => {
-
-    const [transactionsList, setTransactionsList] = useState([])
-    const [lastFour, setLastFour] = useState([])
-    const [filteredReceipts, setFilteredReceipts] = useState([])
-    const [filteredExpenses, setFilteredExpenses] = useState([])
-    const [error, setError] = useState('')
-    const [loading, setLoading] = useState(false)
-
-    useEffect(()=>{
-    const fetchData = async()=>{
-      try {
-        setLoading(true)
-        const query = await getDocs(collection(db,'transactions'));
-        const data = query.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }))
-        setTransactionsList(data)
-        const ordened = data.sort((a,b)=> new Date(b.date) - new Date(a.date))
-        setLastFour(ordened.slice(0,4))
-
-        const filterReceipts = data.filter(trs => trs.type === "Recebimento")
-        setFilteredReceipts(filterReceipts)
-
-        const filterExpenses = data.filter(trs => trs.type === "Despesa")
-        setFilteredExpenses(filterExpenses)
-      } 
-      catch (err) {
-        setError(err)
-      }
-      finally{
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
-
-  const deleteTransaction = async (id) => {
-    try {
-        await deleteDoc(doc(db, 'transactions', id))
-        setTransactionsList(prev => prev.filter(trs => trs.id !== id))
-    } catch (error) {
-        console.error('Erro ao deletar', error)
-    }
-}
-
-  const updateTransaction = async (id, updatedData) => {
-    const docRef = doc(db, "transactions", id);
-      await updateDoc(docRef, updatedData);
-  }
-
-const fetchTransactions = async () => {
-  try {
-    setLoading(true);
-    const query = await getDocs(collection(db,'transactions'));
-    const data = query.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setTransactionsList(data);
-    
-  } finally {
-    setLoading(false);
-  }
+  return {
+    ...item,
+    type: isReceipt ? 'Recebimento' : 'Despesa',
+    value: Number(item.value),
+    date: rawDate,
+  };
 };
 
-useEffect(() => {
-  fetchTransactions();
-}, []);
+const useTransactions = () => {
+  const [transactionsList, setTransactionsList] = useState([]);
+  const [lastFour, setLastFour] = useState([]);
+  const [filteredReceipts, setFilteredReceipts] = useState([]);
+  const [filteredExpenses, setFilteredExpenses] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
+  const fetchTransactions = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const rawData = await transactionService.getAll();
+      const data = Array.isArray(rawData) ? rawData.map(normalizeTransaction) : [];
 
-    return {transactionsList, lastFour, error, 
-      filteredReceipts, filteredExpenses, loading, deleteTransaction, updateTransaction, fetchTransactions}
-}
+      setTransactionsList(data);
 
-export default useTransactions
+      const ordered = [...data].sort((a, b) => new Date(b.date) - new Date(a.date));
+      setLastFour(ordered.slice(0, 4));
+
+      setFilteredReceipts(data.filter((trs) => trs.type === 'Recebimento'));
+      setFilteredExpenses(data.filter((trs) => trs.type === 'Despesa'));
+    } catch (err) {
+      console.error('Erro ao buscar transações no NestJS:', err);
+      setError(err instanceof Error ? err.message : 'Erro ao buscar transações.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
+
+  const createTransaction = async (formData) => {
+    const payload = {
+      ...formData,
+      type: formData.type === 'Recebimento' ? 'RECEBIMENTO' : 'DESPESA',
+      value: Number(formData.value),
+    };
+    const created = await transactionService.create(payload);
+    await fetchTransactions();
+    return normalizeTransaction(created);
+  };
+
+  const updateTransaction = async (id, updatedData) => {
+    const payload = {
+      ...updatedData,
+      ...(updatedData.type && {
+        type: updatedData.type === 'Recebimento' ? 'RECEBIMENTO' : 'DESPESA',
+      }),
+      ...(updatedData.value !== undefined && {
+        value: Number(updatedData.value),
+      }),
+    };
+    const updated = await transactionService.update(id, payload);
+    await fetchTransactions();
+    return normalizeTransaction(updated);
+  };
+
+  const deleteTransaction = async (id) => {
+    await transactionService.delete(id);
+    setTransactionsList((prev) => prev.filter((trs) => trs.id !== id));
+    setLastFour((prev) => prev.filter((trs) => trs.id !== id));
+    setFilteredReceipts((prev) => prev.filter((trs) => trs.id !== id));
+    setFilteredExpenses((prev) => prev.filter((trs) => trs.id !== id));
+  };
+
+  return {
+    transactionsList,
+    lastFour,
+    filteredReceipts,
+    filteredExpenses,
+    error,
+    loading,
+    fetchTransactions,
+    createTransaction,
+    updateTransaction,
+    deleteTransaction,
+  };
+};
+
+export default useTransactions;

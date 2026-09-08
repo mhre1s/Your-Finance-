@@ -1,46 +1,31 @@
 import React from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
-const TransactionCard = ({ receipts }) => {
+const TransactionCard = ({ receipts = 0 }) => {
   const formattedReceipts = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
   }).format(receipts);
 
   return (
-    <div className="w-64 relative group transition-all duration-300 hover:-translate-y-1">
-      {/* Glow effect de fundo (aparece mais no dark mode) */}
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-green-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
-
-      <div className="relative bg-white dark:bg-gray-900 border border-slate-200 dark:border-emerald-500/20 rounded-2xl p-6 shadow-sm w-64 h-40 flex flex-col justify-between overflow-hidden">
-        {/* Detalhe decorativo sutil no fundo */}
-        <div className="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl"></div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg">
-              <ArrowUp
-                className="text-emerald-600 dark:text-emerald-400"
-                size={20}
-                strokeWidth={2.5}
-              />
-            </div>
-            <span className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Recebimentos
-            </span>
-          </div>
+    <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-5 shadow-xs transition-all hover:border-emerald-500/30">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          Receitas no período
+        </span>
+        <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+          <ArrowUpRight size={18} strokeWidth={2.2} />
         </div>
+      </div>
 
-        <div className="mt-4">
-          <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-            {formattedReceipts}
-          </h3>
-          <div className="flex items-center gap-1 mt-1">
-            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full uppercase">
-              Entrada Total
-            </span>
-          </div>
-        </div>
+      <div className="mt-4">
+        <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 tabular-nums">
+          {formattedReceipts}
+        </h3>
+        <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1.5 flex items-center gap-1">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          Entradas registradas
+        </p>
       </div>
     </div>
   );

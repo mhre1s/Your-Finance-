@@ -75,9 +75,17 @@ html,
 body {
     height: 100%;
     margin: 0;
-    /* Remove margens padrão */
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
     height: 100%;
+}
+
+/* Utilitário para valores financeiros: alinhamento vertical exato de algarismos */
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
 }

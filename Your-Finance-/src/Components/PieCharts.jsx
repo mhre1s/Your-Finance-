@@ -19,71 +19,92 @@ const PieCharts = ({ startDate, endDate }) => {
         )
       : transactionsList;
 
-  // Paleta de cores moderna (mais suave)
+  // Paleta moderna, harmoniosa e com bom contraste
   const COLORS = [
-    "#0ea5e9",
-    "#10b981",
-    "#f59e0b",
-    "#f43f5e",
-    "#8b5cf6",
-    "#ec4899",
+    "#10b981", // Emerald
+    "#0284c7", // Sky
+    "#f59e0b", // Amber
+    "#f43f5e", // Rose
+    "#8b5cf6", // Purple
+    "#06b6d4", // Cyan
+    "#64748b", // Slate
   ];
 
   const reduceData = filterData.reduce((acc, trs) => {
-    // Focamos apenas em Despesas para o gráfico de pizza ser útil
-    if (trs.type === "Despesa") {
-      const title = trs.title;
+    const isExpense =
+      trs.type === "Despesa" ||
+      trs.type === "DESPESA" ||
+      trs.type === "saida";
+
+    if (isExpense) {
+      const title = trs.title === "Outros" && trs.expenseName ? trs.expenseName : trs.title;
       let titleExp = acc.find((item) => item.name === title);
       if (!titleExp) {
         titleExp = { name: title, value: 0 };
         acc.push(titleExp);
       }
-      titleExp.value += trs.value;
+      titleExp.value += Number(trs.value);
     }
     return acc;
   }, []);
 
   const data = reduceData.filter((item) => item.value > 0);
 
+  const formatCurrency = (val) =>
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(val);
+
+  if (data.length === 0) {
+    return (
+      <div className="h-full w-full flex items-center justify-center text-xs text-zinc-400">
+        Nenhuma despesa no período.
+      </div>
+    );
+  }
+
   return (
-    // Altura 100% para caber no card que definimos
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
         <Pie
           data={data}
           dataKey="value"
           cx="50%"
-          cy="45%" // Sobe um pouco a pizza para dar espaço para a legenda embaixo
-          innerRadius={60} // Transforma em rosquinha (Premium Look)
-          outerRadius={80}
-          paddingAngle={5} // Espaço entre as fatias
+          cy="45%"
+          innerRadius={55}
+          outerRadius={75}
+          paddingAngle={4}
           stroke="none"
         >
-          {data.map((entry, index) => (
+          {data.map((_, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
 
         <Tooltip
+          formatter={(value) => [formatCurrency(Number(value)), "Despesa"]}
           contentStyle={{
             borderRadius: "12px",
-            border: "none",
+            border: "1px solid rgba(113, 113, 122, 0.2)",
             boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+            backgroundColor: "rgba(24, 24, 27, 0.95)",
+            color: "#f4f4f5",
             fontSize: "12px",
+            padding: "8px 12px",
           }}
-          formatter={(value) => `R$ ${value.toLocaleString("pt-BR")}`}
         />
 
         <Legend
           verticalAlign="bottom"
           align="center"
           iconType="circle"
-          iconSize={10}
+          iconSize={8}
           wrapperStyle={{
-            paddingTop: "20px",
+            paddingTop: "12px",
             fontSize: "11px",
-            fontWeight: "600",
-            color: "#64748b",
+            fontWeight: "500",
+            color: "#a1a1aa",
           }}
         />
       </PieChart>

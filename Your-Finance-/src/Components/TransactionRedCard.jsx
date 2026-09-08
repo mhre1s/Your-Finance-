@@ -1,51 +1,31 @@
 import React from "react";
-import { ArrowDown, TrendingDown } from "lucide-react";
+import { ArrowDownRight } from "lucide-react";
 
-const TransactionRedCard = ({ expenses }) => {
+const TransactionRedCard = ({ expenses = 0 }) => {
   const formattedExpenses = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
   }).format(expenses);
 
   return (
-    <div className="relative group transition-all duration-300 hover:-translate-y-1">
-      {/* Glow effect de fundo em tons de vermelho/rose */}
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-rose-500 to-red-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-300"></div>
-
-      <div className="relative bg-white dark:bg-gray-900 border border-slate-200 dark:border-rose-500/20 rounded-2xl p-6 shadow-sm w-64 h-40 flex flex-col justify-between overflow-hidden">
-        {/* Detalhe decorativo sutil no fundo */}
-        <div className="absolute -right-4 -top-4 w-24 h-24 bg-rose-500/5 rounded-full blur-2xl"></div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-rose-100 dark:bg-rose-500/10 rounded-lg">
-              <ArrowDown
-                className="text-rose-600 dark:text-rose-400"
-                size={20}
-                strokeWidth={2.5}
-              />
-            </div>
-            <span className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Despesas
-            </span>
-          </div>
-          {/* Ícone de tendência sutil */}
-          <TrendingDown
-            size={16}
-            className="text-rose-300 dark:text-rose-900"
-          />
+    <div className="w-full bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl p-5 shadow-xs transition-all hover:border-rose-500/30">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          Despesas no período
+        </span>
+        <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0">
+          <ArrowDownRight size={18} strokeWidth={2.2} />
         </div>
+      </div>
 
-        <div className="mt-4">
-          <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-            {formattedExpenses}
-          </h3>
-          <div className="flex items-center gap-1 mt-1">
-            <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2 py-0.5 rounded-full uppercase">
-              Saída Total
-            </span>
-          </div>
-        </div>
+      <div className="mt-4">
+        <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 tabular-nums">
+          {formattedExpenses}
+        </h3>
+        <p className="text-xs text-rose-600 dark:text-rose-400 font-medium mt-1.5 flex items-center gap-1">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+          Saídas registradas
+        </p>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 .env.local
 .env.*.local
 backend/.env
+backend-nest/.env
 
 # Dependências e builds
 node_modules/

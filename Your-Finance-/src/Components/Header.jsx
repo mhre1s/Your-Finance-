@@ -1,18 +1,25 @@
 import React, { useEffect, useState } from "react";
 import {
   Menu,
-  BarChart,
+  BarChart3,
   LayoutDashboard,
-  Coins,
-  PlusCircle,
+  ArrowUpDown,
+  Plus,
   X,
+  LogOut,
+  User,
+  Wallet,
+  Sun,
+  Moon,
 } from "lucide-react";
-import { RiMoonClearFill, RiSunFill } from "react-icons/ri";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import { useAuth } from "../context/AuthContext";
 
 const Header = () => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [sideBar, setSideBar] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (theme === "dark") {
@@ -23,128 +30,219 @@ const Header = () => {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const changeTheme = (e) => {
-    e.preventDefault();
-    setTheme(theme === "light" ? "dark" : "light");
+  const changeTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
-  const handleSideBar = () => setSideBar(!sideBar);
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const navItems = [
+    {
+      to: "/",
+      icon: <LayoutDashboard size={17} />,
+      label: "Dashboard",
+    },
+    {
+      to: "/transactions",
+      icon: <ArrowUpDown size={17} />,
+      label: "Transações",
+    },
+    {
+      to: "/charts",
+      icon: <BarChart3 size={17} />,
+      label: "Relatórios",
+    },
+  ];
 
   return (
     <>
-      {/* Overlay para fechar a sidebar ao clicar fora */}
+      {/* Overlay para fechar a sidebar mobile ao clicar fora */}
       {sideBar && (
         <div
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[60] transition-opacity"
-          onClick={handleSideBar}
+          className="fixed inset-0 bg-zinc-950/40 backdrop-blur-xs z-40 lg:hidden transition-opacity"
+          onClick={() => setSideBar(false)}
         />
       )}
 
-      {/* Sidebar Reformulada */}
+      {/* Drawer Mobile */}
       <aside
-        className={`fixed top-0 left-0 z-[70] w-72 h-screen transition-all duration-500 will-change-transform bg-white dark:bg-gray-950 border-r border-slate-200 dark:border-gray-800 shadow-2xl ${
-          sideBar
-            ? "translate-x-0 ease-[cubic-bezier(0.4,0,0.2,1)]"
-            : "-translate-x-full ease-in"
+        className={`fixed top-0 left-0 z-50 w-72 h-full bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800 flex flex-col justify-between transition-transform duration-300 ease-in-out lg:hidden ${
+          sideBar ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="p-6 flex flex-col h-full">
-          <div className="flex justify-between items-center mb-12">
-            <h2 className="text-xl font-black tracking-tighter dark:text-white">
-              Menu
-            </h2>
+        <div className="p-5">
+          <div className="flex items-center justify-between pb-5 border-b border-zinc-100 dark:border-zinc-800">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center">
+                <Wallet size={17} strokeWidth={2.2} />
+              </div>
+              <span className="font-semibold text-base text-zinc-900 dark:text-zinc-100">
+                Your Finances
+              </span>
+            </div>
             <button
-              onClick={handleSideBar}
-              className="p-2 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-full transition-colors text-rose-500"
+              onClick={() => setSideBar(false)}
+              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              aria-label="Fechar menu"
             >
-              <X size={24} />
+              <X size={20} />
             </button>
           </div>
 
-          <nav>
-            <ul className="flex flex-col gap-2">
-              {[
-                {
-                  to: "/",
-                  icon: <LayoutDashboard size={20} />,
-                  label: "Dashboard",
-                },
-                {
-                  to: "/charts",
-                  icon: <BarChart size={20} />,
-                  label: "Gráficos",
-                },
-                {
-                  to: "/transactions",
-                  icon: <Coins size={20} />,
-                  label: "Transações",
-                },
-                {
-                  to: "/newtransaction",
-                  icon: <PlusCircle size={20} />,
-                  label: "Adicionar",
-                },
-              ].map((item) => (
-                <li key={item.to}>
-                  <NavLink
-                    to={item.to}
-                    onClick={() => setSideBar(false)}
-                    className={({ isActive }) => `
-                      flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-300 font-medium
-                      ${
-                        isActive
-                          ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-sm"
-                          : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-gray-800"
-                      }
-                    `}
-                  >
-                    {item.icon}
-                    {item.label}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {/* Usuário Logado */}
+          {user && (
+            <div className="mt-4 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold flex items-center justify-center text-sm shrink-0">
+                {user.name ? user.name.charAt(0).toUpperCase() : <User size={16} />}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate leading-tight">
+                  {user.name}
+                </p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                  {user.email}
+                </p>
+              </div>
+            </div>
+          )}
 
-          <div className="mt-auto pt-6 border-t border-slate-100 dark:border-gray-800">
-            <p className="text-xs text-center text-slate-400 uppercase tracking-widest font-bold">
-              Your Finance $
-            </p>
-          </div>
+          {/* Links Mobile */}
+          <nav className="mt-5 space-y-1">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={() => setSideBar(false)}
+                className={({ isActive }) => `
+                  flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors
+                  ${
+                    isActive
+                      ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-semibold"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                  }
+                `}
+              >
+                {item.icon}
+                {item.label}
+              </NavLink>
+            ))}
+
+            <NavLink
+              to="/newtransaction"
+              onClick={() => setSideBar(false)}
+              className="flex items-center gap-3 px-3 py-2.5 mt-2 rounded-xl text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+            >
+              <Plus size={17} strokeWidth={2.2} />
+              Nova Transação
+            </NavLink>
+          </nav>
+        </div>
+
+        {/* Rodapé Drawer */}
+        <div className="p-5 border-t border-zinc-100 dark:border-zinc-800">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+          >
+            <LogOut size={17} />
+            <span>Encerrar sessão</span>
+          </button>
         </div>
       </aside>
 
-      {/* Header Estilizado */}
-      <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-md border-b border-slate-200 dark:border-gray-800 px-4 sm:px-8 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handleSideBar}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-300 text-slate-600 dark:text-slate-300"
-          >
-            <Menu size={24} />
-          </button>
+      {/* Header Principal */}
+      <header className="sticky top-0 z-30 w-full bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          {/* Lado Esquerdo: Botão Mobile + Logo */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSideBar(true)}
+              className="lg:hidden p-2 -ml-2 rounded-lg text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              aria-label="Abrir menu de navegação"
+            >
+              <Menu size={20} />
+            </button>
+
+            <NavLink to="/" className="flex items-center gap-2.5 group">
+              <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+                <Wallet size={17} strokeWidth={2.2} />
+              </div>
+              <span className="font-semibold text-base tracking-tight text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                Your Finances
+              </span>
+            </NavLink>
+          </div>
+
+          {/* Centro: Navegação Desktop (Fintech Clean Style) */}
+          <nav className="hidden lg:flex items-center gap-1 bg-zinc-100/70 dark:bg-zinc-900/70 p-1 rounded-xl border border-zinc-200/60 dark:border-zinc-800/60">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) => `
+                  flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
+                  ${
+                    isActive
+                      ? "bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-xs font-semibold"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200"
+                  }
+                `}
+              >
+                {item.icon}
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* Lado Direito: Ação Nova Transação, Tema e Perfil */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <NavLink
+              to="/newtransaction"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-semibold rounded-lg shadow-xs transition-colors"
+            >
+              <Plus size={16} strokeWidth={2.4} />
+              <span>Nova Transação</span>
+            </NavLink>
+
+            {/* Alternador de Tema */}
+            <button
+              onClick={changeTheme}
+              className="p-2 rounded-lg text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+              title={theme === "light" ? "Mudar para modo escuro" : "Mudar para modo claro"}
+              aria-label="Alternar tema visual"
+            >
+              {theme === "light" ? (
+                <Moon size={18} />
+              ) : (
+                <Sun size={18} className="text-amber-400" />
+              )}
+            </button>
+
+            {/* Perfil / Sair */}
+            {user && (
+              <div className="flex items-center pl-2 border-l border-zinc-200 dark:border-zinc-800 gap-2">
+                <div
+                  className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-semibold flex items-center justify-center text-xs"
+                  title={`${user.name} (${user.email})`}
+                >
+                  {user.name ? user.name.charAt(0).toUpperCase() : <User size={15} />}
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                  title="Encerrar sessão"
+                  aria-label="Sair da conta"
+                >
+                  <LogOut size={17} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-
-        <h1 className="text-2xl font-black tracking-tighter text-slate-900 dark:text-white italic">
-          Your Finance<span className="text-emerald-500 not-italic">$</span>
-        </h1>
-
-        <button
-          onClick={changeTheme}
-          className="p-2 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-full transition-all duration-300 group"
-        >
-          {theme === "light" ? (
-            <RiMoonClearFill
-              size={22}
-              className="text-slate-600 group-hover:text-indigo-500 transition-colors"
-            />
-          ) : (
-            <RiSunFill
-              size={22}
-              className="text-yellow-400 group-hover:rotate-90 transition-transform duration-500"
-            />
-          )}
-        </button>
       </header>
     </>
   );
