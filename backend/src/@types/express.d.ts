@@ -1,5 +1,4 @@
-// Extensão de tipos do Express (Declaration Merging)
-// Permite que req.userId exista com tipagem estrita em middlewares e controllers
+// Extensão de tipos do Express para o NestJS
 declare global {
   namespace Express {
     interface Request {
