@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import NewTransaction from './pages/NewTransaction.jsx';
 import Transactions from './pages/Transactions.jsx';
 import Charts from './pages/Charts.jsx';
+import ResetPassword from './pages/ResetPassword.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -17,8 +18,9 @@ createRoot(document.getElementById('root')).render(
       <AuthProvider>
         <ToastProvider>
           <Routes>
-            {/* Rota Pública de Autenticação */}
+            {/* Rota Pública de Autenticação e Recuperação de Senha */}
             <Route path="/login" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             {/* Rotas Privadas (Protegidas por JWT) */}
             <Route
