@@ -19,15 +19,16 @@ const PieCharts = ({ startDate, endDate }) => {
         )
       : transactionsList;
 
-  // Paleta moderna, harmoniosa e com bom contraste
+  // Paleta de despesas com tons vermelhos, corais e quentes (sem verde)
   const COLORS = [
-    "#10b981", // Emerald
-    "#0284c7", // Sky
-    "#f59e0b", // Amber
-    "#f43f5e", // Rose
-    "#8b5cf6", // Purple
-    "#06b6d4", // Cyan
-    "#64748b", // Slate
+    "#f43f5e", // Vermelho / Rose primário de despesa
+    "#e11d48", // Vermelho carmesim
+    "#fb7185", // Coral / Rose suave
+    "#f97316", // Laranja queimado
+    "#f59e0b", // Âmbar
+    "#d97706", // Ocre escuro
+    "#8b5cf6", // Violeta
+    "#ec4899", // Magenta
   ];
 
   const reduceData = filterData.reduce((acc, trs) => {

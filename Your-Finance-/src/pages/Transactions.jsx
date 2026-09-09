@@ -335,7 +335,7 @@ const Transactions = () => {
                           className={`px-5 sm:px-6 py-3.5 text-right font-medium tabular-nums whitespace-nowrap ${
                             isReceipt
                               ? "text-emerald-600 dark:text-emerald-400"
-                              : "text-zinc-900 dark:text-zinc-100"
+                              : "text-rose-600 dark:text-rose-400"
                           }`}
                         >
                           {isReceipt ? "+ " : "- "}
