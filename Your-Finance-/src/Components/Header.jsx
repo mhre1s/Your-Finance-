@@ -15,6 +15,17 @@ import {
 import { NavLink, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
+/**
+ * Formata o nome para exibir apenas o Primeiro nome + Último sobrenome (apenas exibição visual no front)
+ * Ex: "Matheus Henrique dos Reis Silva" -> "Matheus Silva"
+ */
+const formatDisplayName = (fullName) => {
+  if (!fullName || typeof fullName !== "string") return "";
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length <= 1) return parts[0] || "";
+  return `${parts[0]} ${parts[parts.length - 1]}`;
+};
+
 const Header = () => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [sideBar, setSideBar] = useState(false);
@@ -100,7 +111,7 @@ const Header = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate leading-tight">
-                  {user.name}
+                  {formatDisplayName(user.name)}
                 </p>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
                   {user.email}
@@ -223,13 +234,13 @@ const Header = () => {
 
             {/* Perfil / Sair */}
             {user && (
-              <div className="flex items-center pl-2 border-l border-zinc-200 dark:border-zinc-800 gap-2">
-                <div
-                  className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 font-semibold flex items-center justify-center text-xs"
+              <div className="flex items-center pl-2 sm:pl-3 border-l border-zinc-200 dark:border-zinc-800 gap-2.5">
+                <span
+                  className="text-xs font-semibold text-zinc-700 dark:text-zinc-200 max-w-[130px] sm:max-w-[180px] truncate"
                   title={`${user.name} (${user.email})`}
                 >
-                  {user.name ? user.name.charAt(0).toUpperCase() : <User size={15} />}
-                </div>
+                  {formatDisplayName(user.name)}
+                </span>
 
                 <button
                   onClick={handleLogout}
