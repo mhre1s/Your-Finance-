@@ -6,18 +6,18 @@ const DEFAULT_CATEGORIES = [
   // Despesas
   { name: 'Alimentação', type: TransactionType.DESPESA, color: '#f43f5e', icon: 'Utensils', isDefault: true },
   { name: 'Transporte', type: TransactionType.DESPESA, color: '#f97316', icon: 'Car', isDefault: true },
-  { name: 'Moradia / Contas', type: TransactionType.DESPESA, color: '#0ea5e9', icon: 'Home', isDefault: true },
-  { name: 'Saúde & Farmácia', type: TransactionType.DESPESA, color: '#ec4899', icon: 'HeartPulse', isDefault: true },
+  { name: 'Moradia', type: TransactionType.DESPESA, color: '#0ea5e9', icon: 'Home', isDefault: true },
+  { name: 'Saúde', type: TransactionType.DESPESA, color: '#ec4899', icon: 'HeartPulse', isDefault: true },
   { name: 'Educação', type: TransactionType.DESPESA, color: '#8b5cf6', icon: 'GraduationCap', isDefault: true },
-  { name: 'Lazer & Assinaturas', type: TransactionType.DESPESA, color: '#06b6d4', icon: 'Tv', isDefault: true },
-  { name: 'Viagem / Hospedagem', type: TransactionType.DESPESA, color: '#eab308', icon: 'Plane', isDefault: true },
+  { name: 'Lazer', type: TransactionType.DESPESA, color: '#06b6d4', icon: 'Tv', isDefault: true },
+  { name: 'Viagens', type: TransactionType.DESPESA, color: '#eab308', icon: 'Plane', isDefault: true },
   { name: 'Outros', type: TransactionType.DESPESA, color: '#71717a', icon: 'Tag', isDefault: true },
 
   // Receitas
   { name: 'Salário', type: TransactionType.RECEBIMENTO, color: '#10b981', icon: 'Briefcase', isDefault: true },
-  { name: 'Freelance / Serviços', type: TransactionType.RECEBIMENTO, color: '#14b8a6', icon: 'Laptop', isDefault: true },
+  { name: 'Freelance', type: TransactionType.RECEBIMENTO, color: '#14b8a6', icon: 'Laptop', isDefault: true },
   { name: 'Investimentos', type: TransactionType.RECEBIMENTO, color: '#3b82f6', icon: 'TrendingUp', isDefault: true },
-  { name: 'Outros Rendimentos', type: TransactionType.RECEBIMENTO, color: '#6b7280', icon: 'PlusCircle', isDefault: true },
+  { name: 'Outros', type: TransactionType.RECEBIMENTO, color: '#6b7280', icon: 'PlusCircle', isDefault: true },
 ];
 
 async function seedAndBackfill() {
