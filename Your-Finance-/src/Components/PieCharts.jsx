@@ -58,6 +58,37 @@ const PieCharts = ({ startDate, endDate }) => {
       currency: "BRL",
     }).format(val);
 
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const item = payload[0];
+      const categoryName = item.payload?.name || item.name || "Despesa";
+      const value = item.value;
+      const sliceColor =
+        item.payload?.fill ||
+        item.payload?.color ||
+        item.color ||
+        "#f43f5e";
+
+      return (
+        <div className="bg-zinc-900/95 border border-zinc-700/80 rounded-xl px-3.5 py-2 shadow-xl backdrop-blur-xs">
+          <div className="flex items-center gap-2">
+            <span
+              className="w-2.5 h-2.5 rounded-full shrink-0"
+              style={{ backgroundColor: sliceColor }}
+            />
+            <span className="text-xs font-medium text-zinc-300">
+              {categoryName}:
+            </span>
+            <span className="text-xs font-semibold text-white font-mono">
+              {formatCurrency(Number(value))}
+            </span>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
   if (data.length === 0) {
     return (
       <div className="h-full w-full flex items-center justify-center text-xs text-zinc-400">
@@ -72,6 +103,7 @@ const PieCharts = ({ startDate, endDate }) => {
         <Pie
           data={data}
           dataKey="value"
+          nameKey="name"
           cx="50%"
           cy="45%"
           innerRadius={55}
@@ -80,22 +112,14 @@ const PieCharts = ({ startDate, endDate }) => {
           stroke="none"
         >
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
+            <Cell
+              key={`cell-${index}`}
+              fill={entry.color || COLORS[index % COLORS.length]}
+            />
           ))}
         </Pie>
 
-        <Tooltip
-          formatter={(value) => [formatCurrency(Number(value)), "Despesa"]}
-          contentStyle={{
-            borderRadius: "12px",
-            border: "1px solid rgba(113, 113, 122, 0.2)",
-            boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
-            backgroundColor: "rgba(24, 24, 27, 0.95)",
-            color: "#f4f4f5",
-            fontSize: "12px",
-            padding: "8px 12px",
-          }}
-        />
+        <Tooltip content={<CustomTooltip />} />
 
         <Legend
           verticalAlign="bottom"

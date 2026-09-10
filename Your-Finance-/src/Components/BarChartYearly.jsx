@@ -90,6 +90,8 @@ const BarChartYearly = ({ startDate, endDate }) => {
         <Tooltip
           formatter={(value, name) => [formatCurrency(Number(value)), name]}
           cursor={{ fill: "rgba(113, 113, 122, 0.08)" }}
+          itemStyle={{ color: "#f4f4f5" }}
+          labelStyle={{ color: "#a1a1aa", fontWeight: 600, marginBottom: "4px" }}
           contentStyle={{
             borderRadius: "12px",
             border: "1px solid rgba(113, 113, 122, 0.2)",
