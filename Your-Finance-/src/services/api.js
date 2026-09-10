@@ -77,8 +77,30 @@ export const api = {
   delete: (endpoint, options = {}) => request(endpoint, { method: 'DELETE', ...options }),
 };
 
+let lastPingTime = 0;
+let ongoingPing = null;
+
 export const healthService = {
-  ping: () => api.get('/').catch(() => null),
+  /**
+   * Dispara um ping silencioso para acordar o servidor na nuvem (Render Free Tier).
+   * Implementa deduplicação: se vários componentes chamarem ao mesmo tempo,
+   * apenas uma requisição HTTP real é enviada, com intervalo mínimo de 30 segundos.
+   */
+  ping: () => {
+    const now = Date.now();
+    if (ongoingPing) return ongoingPing;
+    if (now - lastPingTime < 30000) return Promise.resolve(null);
+
+    lastPingTime = now;
+    ongoingPing = api
+      .get('/')
+      .catch(() => null)
+      .finally(() => {
+        ongoingPing = null;
+      });
+
+    return ongoingPing;
+  },
 };
 
 export const authService = {

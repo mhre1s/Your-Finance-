@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router";
 import Header from "../Components/Header";
 import TransactionCard from "../Components/TransactionCard";
 import TransactionRedCard from "../Components/TransactionRedCard";
 import TransactionNeutralCard from "../Components/TransactionNeutralCard";
 import useTransactions from "../Hooks/useTransactions";
+import { healthService } from "../services/api";
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -55,6 +56,25 @@ const getCurrentMonthRange = () => {
 
 const Dashboard = () => {
   const { transactionsList, loading } = useTransactions();
+  const [isWarmingUp, setIsWarmingUp] = useState(false);
+
+  // Wake-up proativo ao montar a rota raiz / (para usuários que acessam com sessão em cache)
+  useEffect(() => {
+    healthService.ping();
+  }, []);
+
+  // Sinalização visual elegante se o carregamento inicial demorar (>2.5s) devido ao cold start do Render
+  useEffect(() => {
+    let timer;
+    if (loading) {
+      timer = setTimeout(() => {
+        setIsWarmingUp(true);
+      }, 2500);
+    } else {
+      setIsWarmingUp(false);
+    }
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   // Range padrão inicial: 1 mês (últimos 30 dias)
   const initialRange = useMemo(() => getDefaultThirtyDaysRange(), []);
@@ -283,6 +303,24 @@ const Dashboard = () => {
             </span>
           </div>
         </div>
+
+        {/* Notificação discreta de cold start caso a nuvem gratuita esteja acordando */}
+        {isWarmingUp && loading && (
+          <div className="mb-6 p-3.5 rounded-2xl bg-white dark:bg-zinc-900 border border-emerald-500/30 dark:border-emerald-500/20 shadow-xs flex items-center justify-between gap-3 text-xs text-zinc-600 dark:text-zinc-300 transition-all duration-300">
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span>
+                <strong>Conectando aos servidores em nuvem:</strong> Como a hospedagem gratuita hiberna após inatividade, a inicialização pode levar cerca de 30 a 40 segundos.
+              </span>
+            </div>
+            <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200/50 dark:border-emerald-800/40 shrink-0">
+              <span>Sincronizando</span>
+            </div>
+          </div>
+        )}
 
         {/* Grid de Métricas Financeiras (Vinculadas ao Range) */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">

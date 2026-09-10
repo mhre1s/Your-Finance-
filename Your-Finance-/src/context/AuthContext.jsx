@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authService, storage } from '../services/api';
+import { authService, healthService, storage } from '../services/api';
 
 const AuthContext = createContext({
   user: null,
@@ -17,6 +17,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Wake-up proativo global na inicialização da aplicação
+    healthService.ping();
+
     // Validação inicial do estado salvo
     const savedToken = storage.getToken();
     const savedUser = storage.getUser();
