@@ -22,20 +22,34 @@ const BarChartComp = ({ startDate, endDate }) => {
         )
       : transactionsList;
 
-  // 2. Agrupamento por mês
+  const MONTH_NAMES_SHORT = [
+    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+    "Jul", "Ago", "Set", "Out", "Nov", "Dez",
+  ];
+
+  const MONTH_NAMES_FULL = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+  ];
+
+  // 2. Agrupamento inequívoco por mês e ano (ex: "Set/2026")
   const data = filteredData.reduce((acc, trans) => {
-    const month = new Date(trans.date).toLocaleString("pt-BR", {
-      month: "short",
-      year: "2-digit",
-    });
-    let monthData = acc.find((item) => item.month === month);
+    const dateParts = typeof trans.date === "string" ? trans.date.split("-") : [];
+    const year = dateParts[0] || new Date(trans.date).getFullYear();
+    const monthIdx = dateParts[1] ? Number(dateParts[1]) - 1 : new Date(trans.date).getMonth();
+
+    const shortLabel = `${MONTH_NAMES_SHORT[monthIdx]}/${year}`; // Ex: "Set/2026"
+    const fullLabel = `${MONTH_NAMES_FULL[monthIdx]} de ${year}`; // Ex: "Setembro de 2026"
+
+    let monthData = acc.find((item) => item.month === shortLabel);
 
     if (!monthData) {
       monthData = {
-        month,
+        month: shortLabel,
+        fullLabel,
         Receita: 0,
         Despesa: 0,
-        _date: new Date(trans.date),
+        _sortKey: `${year}-${String(monthIdx + 1).padStart(2, "0")}`,
       };
       acc.push(monthData);
     }
@@ -53,7 +67,7 @@ const BarChartComp = ({ startDate, endDate }) => {
     return acc;
   }, []);
 
-  data.sort((a, b) => a._date - b._date);
+  data.sort((a, b) => a._sortKey.localeCompare(b._sortKey));
 
   const formatCurrency = (val) =>
     new Intl.NumberFormat("pt-BR", {
@@ -94,6 +108,12 @@ const BarChartComp = ({ startDate, endDate }) => {
 
         <Tooltip
           formatter={(value, name) => [formatCurrency(Number(value)), name]}
+          labelFormatter={(label, payload) => {
+            if (payload && payload.length && payload[0]?.payload?.fullLabel) {
+              return payload[0].payload.fullLabel;
+            }
+            return label;
+          }}
           cursor={{ fill: "rgba(113, 113, 122, 0.08)" }}
           itemStyle={{ color: "#f4f4f5" }}
           labelStyle={{ color: "#a1a1aa", fontWeight: 600, marginBottom: "4px" }}
