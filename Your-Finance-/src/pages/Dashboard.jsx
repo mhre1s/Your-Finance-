@@ -385,9 +385,21 @@ const Dashboard = () => {
                         </td>
 
                         <td className="px-5 sm:px-6 py-3.5 font-medium text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
-                          {transaction.title === "Outros"
-                            ? transaction.expenseName || "Outros"
-                            : transaction.title}
+                          <div className="flex items-center gap-2">
+                            <span>{transaction.title}</span>
+                            {transaction.category && (
+                              <span
+                                className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0"
+                                style={{
+                                  backgroundColor: `${transaction.category.color}15`,
+                                  color: transaction.category.color,
+                                  border: `1px solid ${transaction.category.color}35`,
+                                }}
+                              >
+                                {transaction.category.name}
+                              </span>
+                            )}
+                          </div>
                         </td>
 
                         <td className="px-5 sm:px-6 py-3.5 text-xs text-zinc-500 dark:text-zinc-400 whitespace-nowrap">

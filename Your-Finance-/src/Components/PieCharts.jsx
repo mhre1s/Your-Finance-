@@ -38,13 +38,14 @@ const PieCharts = ({ startDate, endDate }) => {
       trs.type === "saida";
 
     if (isExpense) {
-      const title = trs.title === "Outros" && trs.expenseName ? trs.expenseName : trs.title;
-      let titleExp = acc.find((item) => item.name === title);
-      if (!titleExp) {
-        titleExp = { name: title, value: 0 };
-        acc.push(titleExp);
+      const categoryName = trs.category?.name || "Outros";
+      const categoryColor = trs.category?.color || null;
+      let categoryItem = acc.find((item) => item.name === categoryName);
+      if (!categoryItem) {
+        categoryItem = { name: categoryName, value: 0, color: categoryColor };
+        acc.push(categoryItem);
       }
-      titleExp.value += Number(trs.value);
+      categoryItem.value += Number(trs.value);
     }
     return acc;
   }, []);
@@ -78,8 +79,8 @@ const PieCharts = ({ startDate, endDate }) => {
           paddingAngle={4}
           stroke="none"
         >
-          {data.map((_, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={entry.color || COLORS[index % COLORS.length]} />
           ))}
         </Pie>
 

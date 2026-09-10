@@ -84,6 +84,12 @@ export const authService = {
   resetPassword: (token, password) => api.post('/auth/reset-password', { token, password }),
 };
 
+export const categoryService = {
+  getAll: () => api.get('/categories'),
+  create: (data) => api.post('/categories', data),
+  delete: (id) => api.delete(`/categories/${id}`),
+};
+
 export const transactionService = {
   getAll: () => api.get('/transactions'),
   getById: (id) => api.get(`/transactions/${id}`),
@@ -91,3 +97,4 @@ export const transactionService = {
   update: (id, data) => api.put(`/transactions/${id}`, data),
   delete: (id) => api.delete(`/transactions/${id}`),
 };
+

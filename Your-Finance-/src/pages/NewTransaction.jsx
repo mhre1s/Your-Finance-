@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
 import Header from "../Components/Header";
+import CurrencyInput from "../Components/CurrencyInput";
 import useTransactions from "../Hooks/useTransactions";
+import { categoryService } from "../services/api";
 import { useToast } from "../context/ToastContext";
 import {
   ArrowUpRight,
@@ -10,6 +12,8 @@ import {
   Tag,
   ArrowLeft,
   Check,
+  Plus,
+  X,
 } from "lucide-react";
 
 const NewTransaction = () => {
@@ -18,48 +22,104 @@ const NewTransaction = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  // Modal para criar categoria customizada exclusiva do usuário
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [newCatName, setNewCatName] = useState("");
+  const [newCatColor, setNewCatColor] = useState("#8b5cf6");
+  const [creatingCategory, setCreatingCategory] = useState(false);
+
   const [formData, setFormData] = useState({
     type: "Recebimento",
     title: "",
-    value: "",
+    value: 0,
+    categoryId: "",
     date: new Date().toISOString().split("T")[0],
-    expenseName: "",
   });
 
-  const formatValue = (value) => {
-    return Number(String(value).replace(",", "."));
+  const isReceipt = formData.type === "Recebimento";
+  const currentTypeEnum = isReceipt ? "RECEBIMENTO" : "DESPESA";
+
+  const fetchCategories = async () => {
+    try {
+      setLoadingCategories(true);
+      const data = await categoryService.getAll();
+      setCategories(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Erro ao carregar categorias:", err);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const filteredCategories = categories.filter((c) => c.type === currentTypeEnum);
+
+  const handleCreateCategory = async (e) => {
+    e.preventDefault();
+    if (!newCatName.trim()) {
+      toast.error("Nome obrigatório", "Digite um nome para a nova categoria.");
+      return;
+    }
+
+    try {
+      setCreatingCategory(true);
+      const created = await categoryService.create({
+        name: newCatName.trim(),
+        type: currentTypeEnum,
+        color: newCatColor,
+      });
+
+      toast.success("Categoria criada", `A categoria "${created.name}" foi adicionada com sucesso.`);
+      setCategories((prev) => [...prev, created]);
+      setFormData((prev) => ({ ...prev, categoryId: created.id }));
+      setShowCategoryModal(false);
+      setNewCatName("");
+    } catch (err) {
+      console.error("Erro ao criar categoria:", err);
+      toast.error(
+        "Erro ao criar categoria",
+        err instanceof Error ? err.message : "Não foi possível criar a categoria."
+      );
+    } finally {
+      setCreatingCategory(false);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.title && formData.type === "Recebimento") {
-      toast.error("Campo obrigatório", "Informe a descrição da receita.");
+    if (!formData.title.trim()) {
+      toast.error("Campo obrigatório", "Informe a descrição da movimentação.");
       return;
     }
 
-    if (!formData.title && formData.type === "Despesa") {
-      toast.error("Campo obrigatório", "Selecione a categoria da despesa.");
-      return;
-    }
-
-    const numValue = formatValue(formData.value);
-    if (isNaN(numValue) || numValue <= 0) {
-      toast.error("Valor inválido", "Informe um valor numérico maior que zero.");
+    if (!formData.value || formData.value <= 0) {
+      toast.error("Valor inválido", "Informe um valor maior que R$ 0,00.");
       return;
     }
 
     try {
       setLoading(true);
       await createTransaction({
-        ...formData,
-        value: numValue,
+        type: formData.type,
+        title: formData.title.trim(),
+        value: formData.value,
+        date: formData.date,
+        categoryId: formData.categoryId || undefined,
       });
 
-      // Disparo do Toast elegante exigido pelo usuário
       toast.success(
         "Transação registrada",
-        `${formData.type === "Recebimento" ? "Receita" : "Despesa"} de R$ ${numValue.toFixed(2)} cadastrada com sucesso.`
+        `${isReceipt ? "Receita" : "Despesa"} de ${new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).format(formData.value)} cadastrada com sucesso.`
       );
 
       navigate("/transactions");
@@ -74,12 +134,17 @@ const NewTransaction = () => {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
-
-  const isReceipt = formData.type === "Recebimento";
+  const PRESET_COLORS = [
+    "#f43f5e",
+    "#f97316",
+    "#eab308",
+    "#10b981",
+    "#06b6d4",
+    "#3b82f6",
+    "#8b5cf6",
+    "#ec4899",
+    "#71717a",
+  ];
 
   return (
     <div className="bg-zinc-50 dark:bg-zinc-950 min-h-screen flex flex-col text-zinc-900 dark:text-zinc-100 transition-colors">
@@ -108,7 +173,7 @@ const NewTransaction = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Seletor de Tipo (Segmented Control Elegante) */}
+            {/* Seletor de Tipo (Segmented Control) */}
             <div>
               <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-2">
                 Tipo de movimentação
@@ -120,8 +185,7 @@ const NewTransaction = () => {
                     setFormData((prev) => ({
                       ...prev,
                       type: "Recebimento",
-                      title: "",
-                      expenseName: "",
+                      categoryId: "",
                     }))
                   }
                   className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
@@ -140,8 +204,7 @@ const NewTransaction = () => {
                     setFormData((prev) => ({
                       ...prev,
                       type: "Despesa",
-                      title: "",
-                      expenseName: "",
+                      categoryId: "",
                     }))
                   }
                   className={`flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
@@ -156,83 +219,81 @@ const NewTransaction = () => {
               </div>
             </div>
 
-            {/* Descrição / Categoria */}
+            {/* Descrição Limpa */}
             <div>
               <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">
-                {isReceipt ? "Descrição da receita" : "Categoria da despesa"}
+                Descrição da movimentação
               </label>
+              <input
+                type="text"
+                name="title"
+                required
+                placeholder={
+                  isReceipt
+                    ? "Ex: Salário da empresa, Rendimento de ações, Freelance..."
+                    : "Ex: Supermercado Semaninha, Gasolina, Almoço no restaurante..."
+                }
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, title: e.target.value }))
+                }
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              />
+            </div>
+
+            {/* Categoria com botão para criar nova categoria exclusiva */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                  Categoria
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryModal(true)}
+                  className="inline-flex items-center gap-1 text-[11px] text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-semibold transition-colors cursor-pointer"
+                >
+                  <Plus size={13} />
+                  <span>Nova Categoria</span>
+                </button>
+              </div>
+
               <div className="relative flex items-center">
                 <div className="absolute left-3.5 text-zinc-400 pointer-events-none">
                   <Tag size={16} />
                 </div>
-                {isReceipt ? (
-                  <input
-                    type="text"
-                    name="title"
-                    required
-                    placeholder="Ex: Salário, Projeto Freelance, Rendimentos..."
-                    value={formData.title}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
-                  />
-                ) : (
-                  <select
-                    name="title"
-                    required
-                    value={formData.title}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
-                  >
-                    <option value="">Selecione uma categoria...</option>
-                    <option value="Alimentação">Alimentação</option>
-                    <option value="Contas residenciais">Contas residenciais (Água, Luz, Internet)</option>
-                    <option value="Condução">Transporte / Condução</option>
-                    <option value="Saúde">Saúde & Farmácia</option>
-                    <option value="Educação">Educação</option>
-                    <option value="Lazer">Lazer & Assinaturas</option>
-                    <option value="Outros">Outros</option>
-                  </select>
-                )}
+                <select
+                  name="categoryId"
+                  value={formData.categoryId}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, categoryId: e.target.value }))
+                  }
+                  className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
+                >
+                  <option value="">Selecione uma categoria...</option>
+                  {filteredCategories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name} {!cat.isDefault ? "(Personalizada)" : ""}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
-            {/* Campo dinâmico quando despesa for "Outros" */}
-            {!isReceipt && formData.title === "Outros" && (
-              <div>
-                <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">
-                  Especifique a despesa
-                </label>
-                <input
-                  type="text"
-                  name="expenseName"
-                  required
-                  placeholder="Ex: Reparo automotivo, Compra de equipamento..."
-                  value={formData.expenseName}
-                  onChange={handleChange}
-                  className="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
-                />
-              </div>
-            )}
-
-            {/* Grid Valor e Data */}
+            {/* Grid Valor com Máscara BRL e Data */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">
                   Valor (R$)
                 </label>
                 <div className="relative flex items-center">
-                  <span className="absolute left-3.5 text-xs font-semibold text-zinc-400 pointer-events-none">
-                    R$
-                  </span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="value"
-                    required
-                    placeholder="0,00"
+                  <CurrencyInput
                     value={formData.value}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm font-semibold tabular-nums text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                    onChange={(val) =>
+                      setFormData((prev) => ({ ...prev, value: val.numericValue }))
+                    }
+                    placeholder="R$ 0,00"
+                    required
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm font-semibold tabular-nums text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                   />
                 </div>
               </div>
@@ -250,7 +311,9 @@ const NewTransaction = () => {
                     name="date"
                     required
                     value={formData.date}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, date: e.target.value }))
+                    }
                     className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                   />
                 </div>
@@ -277,6 +340,86 @@ const NewTransaction = () => {
           </form>
         </div>
       </main>
+
+      {/* Modal: Criar Categoria Personalizada Exclusiva do Usuário */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/60 backdrop-blur-xs">
+          <div
+            className="fixed inset-0"
+            onClick={() => !creatingCategory && setShowCategoryModal(false)}
+          />
+          <div className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 shadow-xl">
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-100 dark:border-zinc-800">
+              <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                Nova Categoria ({isReceipt ? "Receita" : "Despesa"})
+              </h3>
+              <button
+                onClick={() => setShowCategoryModal(false)}
+                className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 rounded-lg cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCategory} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+                  Nome da categoria
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ex: Jogos de video game, Pet Shop..."
+                  value={newCatName}
+                  onChange={(e) => setNewCatName(e.target.value)}
+                  className="w-full px-3 py-2 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                />
+                <p className="text-[11px] text-zinc-400 mt-1">
+                  🔒 Categoria privada: visível apenas para você.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">
+                  Cor da categoria
+                </label>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {PRESET_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setNewCatColor(color)}
+                      className={`w-6 h-6 rounded-full border-2 transition-all cursor-pointer ${
+                        newCatColor === color
+                          ? "border-zinc-900 dark:border-white scale-110 shadow-xs"
+                          : "border-transparent hover:scale-105"
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryModal(false)}
+                  className="px-3 py-2 text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={creatingCategory}
+                  className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors cursor-pointer disabled:opacity-60"
+                >
+                  {creatingCategory ? "Salvando..." : "Salvar Categoria"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

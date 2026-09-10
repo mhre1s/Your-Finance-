@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router";
 import useTransactions from "../Hooks/useTransactions";
 import Header from "../Components/Header";
+import CurrencyInput from "../Components/CurrencyInput";
+import { categoryService } from "../services/api";
 import { useToast } from "../context/ToastContext";
 import {
   Pencil,
@@ -16,6 +18,7 @@ import {
   Plus,
   Receipt,
   AlertTriangle,
+  Tag,
 } from "lucide-react";
 
 const Transactions = () => {
@@ -34,24 +37,32 @@ const Transactions = () => {
 
   const { toast } = useToast();
 
+  const [categories, setCategories] = useState([]);
   const [editTitle, setEditTitle] = useState("");
-  const [editValue, setEditValue] = useState("");
+  const [editValue, setEditValue] = useState(0);
   const [editDate, setEditDate] = useState("");
   const [editType, setEditType] = useState("");
+  const [editCategoryId, setEditCategoryId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filterDate, setFilterDate] = useState("");
   const [filterType, setFilterType] = useState("");
   const [showFilterMenu, setShowFilterMenu] = useState(false);
 
+  useEffect(() => {
+    categoryService.getAll().then((data) => {
+      if (Array.isArray(data)) setCategories(data);
+    }).catch(console.error);
+  }, []);
+
   const transactionsPerPage = 10;
 
   const filteredTransactions = transactionsList.filter((transaction) => {
     const titleToMatch = (transaction.title || "").toLowerCase();
-    const expenseToMatch = (transaction.expenseName || "").toLowerCase();
+    const categoryToMatch = (transaction.category?.name || "").toLowerCase();
     const query = search.toLowerCase();
 
-    const matchesTitle = titleToMatch.includes(query) || expenseToMatch.includes(query);
+    const matchesTitle = titleToMatch.includes(query) || categoryToMatch.includes(query);
     const matchesType = filterType ? transaction.type === filterType : true;
     const matchesDate = filterDate ? transaction.date === filterDate : true;
     return matchesTitle && matchesDate && matchesType;
@@ -69,6 +80,7 @@ const Transactions = () => {
     setEditValue(t.value);
     setEditDate(t.date);
     setEditType(t.type);
+    setEditCategoryId(t.categoryId || "");
     setUpdateModal(true);
   };
 
@@ -76,7 +88,7 @@ const Transactions = () => {
     e.preventDefault();
     if (!selectedTransaction) return;
 
-    const numValue = Number(String(editValue).replace(",", "."));
+    const numValue = typeof editValue === "number" ? editValue : Number(String(editValue).replace(",", "."));
     if (isNaN(numValue) || numValue <= 0) {
       toast.error("Valor inválido", "Informe um valor numérico válido.");
       return;
@@ -85,10 +97,11 @@ const Transactions = () => {
     try {
       setActionLoading(true);
       await updateTransaction(selectedTransaction.id, {
-        title: editTitle,
+        title: editTitle.trim(),
         value: numValue,
         date: editDate,
         type: editType,
+        categoryId: editCategoryId || undefined,
       });
       await fetchTransactions();
       toast.success("Transação atualizada", "Os dados foram salvos com sucesso.");
@@ -324,7 +337,21 @@ const Transactions = () => {
                         </td>
 
                         <td className="px-5 sm:px-6 py-3.5 font-medium text-zinc-900 dark:text-zinc-100 whitespace-nowrap">
-                          {t.title === "Outros" ? t.expenseName || "Outros" : t.title}
+                          <div className="flex items-center gap-2">
+                            <span>{t.title}</span>
+                            {t.category && (
+                              <span
+                                className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold shrink-0"
+                                style={{
+                                  backgroundColor: `${t.category.color}15`,
+                                  color: t.category.color,
+                                  border: `1px solid ${t.category.color}35`,
+                                }}
+                              >
+                                {t.category.name}
+                              </span>
+                            )}
+                          </div>
                         </td>
 
                         <td className="px-5 sm:px-6 py-3.5 text-xs text-zinc-500 dark:text-zinc-400 whitespace-nowrap">
@@ -532,12 +559,11 @@ const Transactions = () => {
                   <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
                     Valor (R$)
                   </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    required
+                  <CurrencyInput
                     value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
+                    onChange={(val) => setEditValue(val.numericValue)}
+                    placeholder="R$ 0,00"
+                    required
                     className="w-full px-3.5 py-2 bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm font-semibold tabular-nums text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   />
                 </div>
@@ -548,13 +574,36 @@ const Transactions = () => {
                   </label>
                   <select
                     value={editType}
-                    onChange={(e) => setEditType(e.target.value)}
+                    onChange={(e) => {
+                      setEditType(e.target.value);
+                      setEditCategoryId("");
+                    }}
                     className="w-full px-3.5 py-2 bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
                   >
                     <option value="Recebimento">Recebimento</option>
                     <option value="Despesa">Despesa</option>
                   </select>
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">
+                  Categoria
+                </label>
+                <select
+                  value={editCategoryId}
+                  onChange={(e) => setEditCategoryId(e.target.value)}
+                  className="w-full px-3.5 py-2 bg-white dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer"
+                >
+                  <option value="">Sem categoria</option>
+                  {categories
+                    .filter((c) => c.type === (editType === "Recebimento" ? "RECEBIMENTO" : "DESPESA"))
+                    .map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name} {!cat.isDefault ? "(Personalizada)" : ""}
+                      </option>
+                    ))}
+                </select>
               </div>
 
               <div>

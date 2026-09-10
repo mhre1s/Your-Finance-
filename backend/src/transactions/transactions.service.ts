@@ -19,6 +19,10 @@ export class TransactionsService {
         value: data.value,
         date: new Date(data.date),
         userId,
+        categoryId: data.categoryId || null,
+      },
+      include: {
+        category: true,
       },
     });
   }
@@ -27,6 +31,9 @@ export class TransactionsService {
   async findAll(userId: string): Promise<Transaction[]> {
     return await this.prisma.transaction.findMany({
       where: { userId },
+      include: {
+        category: true,
+      },
       orderBy: { date: 'desc' },
     });
   }
@@ -35,6 +42,9 @@ export class TransactionsService {
   async findById(userId: string, id: string): Promise<Transaction> {
     const transaction = await this.prisma.transaction.findFirst({
       where: { id, userId },
+      include: {
+        category: true,
+      },
     });
 
     if (!transaction) {
@@ -59,6 +69,10 @@ export class TransactionsService {
         ...(data.expenseName !== undefined && { expenseName: data.expenseName }),
         ...(data.value !== undefined && { value: data.value }),
         ...(data.date && { date: new Date(data.date) }),
+        ...(data.categoryId !== undefined && { categoryId: data.categoryId || null }),
+      },
+      include: {
+        category: true,
       },
     });
   }

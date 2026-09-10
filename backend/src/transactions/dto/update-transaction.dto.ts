@@ -10,4 +10,5 @@ export class UpdateTransactionDto {
   expenseName?: string;
   value?: number;
   date?: string; // Formato "YYYY-MM-DD"
+  categoryId?: string;
 }
