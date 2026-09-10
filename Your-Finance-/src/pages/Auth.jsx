@@ -1,9 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '../context/AuthContext';
-import { authService } from '../services/api';
+import { authService, healthService } from '../services/api';
 import { useToast } from '../context/ToastContext';
 import { Mail, Lock, User, ArrowRight, AlertCircle, CheckCircle2, Wallet, Sun, Moon, ArrowLeft, KeyRound, Eye, EyeOff } from 'lucide-react';
+
+/**
+ * Indicador de Cold Start de alta fidelidade visual.
+ * Exibido quando a instância gratuita do Render está em processo de despertar (>2.5s).
+ */
+const ColdStartBanner = ({ stage }) => {
+  const stageMessages = {
+    1: 'Conectando ao servidor em nuvem...',
+    2: 'Inicializando serviços e banco de dados...',
+    3: 'Quase pronto! Concluindo autenticação...',
+  };
+
+  const progressWidth = stage === 1 ? '35%' : stage === 2 ? '70%' : '92%';
+
+  return (
+    <div className="mt-3.5 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200/80 dark:border-zinc-700/60 transition-all duration-300">
+      <div className="flex items-center justify-between gap-2 mb-1.5">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span className="text-[11px] font-medium text-zinc-700 dark:text-zinc-300">
+            {stageMessages[stage] || stageMessages[1]}
+          </span>
+        </div>
+        <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-200/60 dark:border-emerald-800/40">
+          Iniciando
+        </span>
+      </div>
+
+      <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed mb-2.5">
+        A infraestrutura gratuita em nuvem hiberna após períodos sem uso e leva cerca de 30 a 45 segundos para reativar. Sua sessão será aberta em instantes.
+      </p>
+
+      <div className="w-full bg-zinc-200 dark:bg-zinc-700 h-1 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out"
+          style={{ width: progressWidth }}
+        />
+      </div>
+    </div>
+  );
+};
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -25,12 +69,51 @@ const Auth = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [isWarmingUp, setIsWarmingUp] = useState(false);
+  const [warmupStage, setWarmupStage] = useState(0);
 
   const { login, register, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
+  // Wake-up proativo: acorda o Render em segundo plano enquanto o usuário interage
+  useEffect(() => {
+    healthService.ping();
+  }, []);
+
+  // Monitora cold start (> 2.5s) com estágios progressivos para feedback em tempo real
+  const isRequestInProgress = submitting || forgotLoading;
+  useEffect(() => {
+    let timer1;
+    let timer2;
+    let timer3;
+
+    if (isRequestInProgress) {
+      timer1 = setTimeout(() => {
+        setIsWarmingUp(true);
+        setWarmupStage(1);
+      }, 2500);
+
+      timer2 = setTimeout(() => {
+        setWarmupStage(2);
+      }, 14000);
+
+      timer3 = setTimeout(() => {
+        setWarmupStage(3);
+      }, 28000);
+    } else {
+      setIsWarmingUp(false);
+      setWarmupStage(0);
+    }
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
+  }, [isRequestInProgress]);
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -215,6 +298,8 @@ const Auth = () => {
                       </>
                     )}
                   </button>
+
+                  {isWarmingUp && forgotLoading && <ColdStartBanner stage={warmupStage} />}
 
                   <div className="text-center pt-1">
                     <button
@@ -413,6 +498,8 @@ const Auth = () => {
                       </>
                     )}
                   </button>
+
+                  {isWarmingUp && submitting && <ColdStartBanner stage={warmupStage} />}
                 </div>
               </form>
             </>

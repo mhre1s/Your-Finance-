@@ -55,13 +55,14 @@ const useTransactions = () => {
     fetchTransactions();
   }, [fetchTransactions]);
 
-  const createTransaction = async (formData) => {
+  const createTransaction = async (formData, idempotencyKey = null) => {
     const payload = {
       ...formData,
       type: formData.type === 'Recebimento' ? 'RECEBIMENTO' : 'DESPESA',
       value: Number(formData.value),
     };
-    const created = await transactionService.create(payload);
+    const headers = idempotencyKey ? { 'x-idempotency-key': idempotencyKey } : {};
+    const created = await transactionService.create(payload, headers);
     await fetchTransactions();
     return normalizeTransaction(created);
   };

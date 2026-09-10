@@ -9,22 +9,70 @@ export class TransactionsService {
   // O PrismaService é injetado automaticamente pelo NestJS via Inversão de Controle
   constructor(private readonly prisma: PrismaService) {}
 
-  // 1. Criação de transação vinculada obrigatoriamente ao usuário logado
-  async create(userId: string, data: CreateTransactionDto): Promise<Transaction> {
-    return await this.prisma.transaction.create({
-      data: {
-        type: data.type,
-        title: data.title,
-        expenseName: data.expenseName || null,
-        value: data.value,
-        date: new Date(data.date),
-        userId,
-        categoryId: data.categoryId || null,
-      },
-      include: {
-        category: true,
-      },
-    });
+  // 1. Criação de transação vinculada obrigatoriamente ao usuário logado (com suporte a Idempotência)
+  async create(
+    userId: string,
+    data: CreateTransactionDto,
+    idempotencyKey?: string,
+  ): Promise<Transaction> {
+    const cleanKey = idempotencyKey && idempotencyKey.trim().length > 0 ? idempotencyKey.trim() : null;
+
+    // Se foi fornecida uma chave de idempotência, verifica se a requisição já foi processada
+    if (cleanKey) {
+      const existing = await this.prisma.transaction.findFirst({
+        where: {
+          idempotencyKey: cleanKey,
+          userId,
+        },
+        include: {
+          category: true,
+        },
+      });
+
+      if (existing) {
+        // Idempotência bancária: devolve a transação já existente sem duplicar
+        return existing;
+      }
+    }
+
+    try {
+      return await this.prisma.transaction.create({
+        data: {
+          type: data.type,
+          title: data.title,
+          expenseName: data.expenseName || null,
+          value: data.value,
+          date: new Date(data.date),
+          userId,
+          categoryId: data.categoryId || null,
+          idempotencyKey: cleanKey,
+        },
+        include: {
+          category: true,
+        },
+      });
+    } catch (error) {
+      // Trata corrida concorrente no banco (índice único P2002) devolvendo a transação já gravada
+      if (
+        cleanKey &&
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        error.code === 'P2002'
+      ) {
+        const existing = await this.prisma.transaction.findFirst({
+          where: {
+            idempotencyKey: cleanKey,
+            userId,
+          },
+          include: {
+            category: true,
+          },
+        });
+        if (existing) return existing;
+      }
+      throw error;
+    }
   }
 
   // 2. Listagem de todas as transações do usuário logado (ordenadas por data decrescente)

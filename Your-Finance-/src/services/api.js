@@ -71,10 +71,14 @@ async function request(endpoint, options = {}) {
 }
 
 export const api = {
-  get: (endpoint) => request(endpoint, { method: 'GET' }),
-  post: (endpoint, body) => request(endpoint, { method: 'POST', body: JSON.stringify(body) }),
-  put: (endpoint, body) => request(endpoint, { method: 'PUT', body: JSON.stringify(body) }),
-  delete: (endpoint) => request(endpoint, { method: 'DELETE' }),
+  get: (endpoint, options = {}) => request(endpoint, { method: 'GET', ...options }),
+  post: (endpoint, body, options = {}) => request(endpoint, { method: 'POST', body: JSON.stringify(body), ...options }),
+  put: (endpoint, body, options = {}) => request(endpoint, { method: 'PUT', body: JSON.stringify(body), ...options }),
+  delete: (endpoint, options = {}) => request(endpoint, { method: 'DELETE', ...options }),
+};
+
+export const healthService = {
+  ping: () => api.get('/').catch(() => null),
 };
 
 export const authService = {
@@ -93,7 +97,7 @@ export const categoryService = {
 export const transactionService = {
   getAll: () => api.get('/transactions'),
   getById: (id) => api.get(`/transactions/${id}`),
-  create: (data) => api.post('/transactions', data),
+  create: (data, headers = {}) => api.post('/transactions', data, { headers }),
   update: (id, data) => api.put(`/transactions/${id}`, data),
   delete: (id) => api.delete(`/transactions/${id}`),
 };

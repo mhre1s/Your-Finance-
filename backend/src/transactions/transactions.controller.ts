@@ -56,10 +56,19 @@ export class TransactionsController {
       throw new BadRequestException('Data inválida. Forneça uma data no formato YYYY-MM-DD.');
     }
 
-    return await this.transactionsService.create(req.userId!, {
-      ...data,
-      value: numericValue,
-    });
+    const idempotencyKey = (
+      req.headers['x-idempotency-key'] ||
+      req.headers['idempotency-key']
+    ) as string | undefined;
+
+    return await this.transactionsService.create(
+      req.userId!,
+      {
+        ...data,
+        value: numericValue,
+      },
+      idempotencyKey,
+    );
   }
 
   @Get()

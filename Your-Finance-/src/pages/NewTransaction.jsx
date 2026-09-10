@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router";
 import Header from "../Components/Header";
 import CurrencyInput from "../Components/CurrencyInput";
@@ -20,6 +20,9 @@ const NewTransaction = () => {
   const { createTransaction } = useTransactions();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const isSubmittingRef = useRef(false);
+  const idempotencyKeyRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -94,6 +97,9 @@ const NewTransaction = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Trava síncrona contra múltiplos cliques concorrentes
+    if (isSubmittingRef.current) return;
+
     if (!formData.title.trim()) {
       toast.error("Campo obrigatório", "Informe a descrição da movimentação.");
       return;
@@ -104,15 +110,28 @@ const NewTransaction = () => {
       return;
     }
 
+    isSubmittingRef.current = true;
+    setLoading(true);
+
+    // Gera chave de idempotência única para este envio (ou preserva se for retentativa)
+    if (!idempotencyKeyRef.current) {
+      idempotencyKeyRef.current =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `idemp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    }
+
     try {
-      setLoading(true);
-      await createTransaction({
-        type: formData.type,
-        title: formData.title.trim(),
-        value: formData.value,
-        date: formData.date,
-        categoryId: formData.categoryId || undefined,
-      });
+      await createTransaction(
+        {
+          type: formData.type,
+          title: formData.title.trim(),
+          value: formData.value,
+          date: formData.date,
+          categoryId: formData.categoryId || undefined,
+        },
+        idempotencyKeyRef.current
+      );
 
       toast.success(
         "Transação registrada",
@@ -131,6 +150,7 @@ const NewTransaction = () => {
       );
     } finally {
       setLoading(false);
+      isSubmittingRef.current = false;
     }
   };
 
